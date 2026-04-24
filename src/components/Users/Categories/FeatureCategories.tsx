@@ -17,11 +17,24 @@ export default function CategoryStrip() {
       sx={{
         display: "flex",
         overflowX: "auto",
-        gap: 4,
+        gap: 3,
         p: 2,
         borderBottom: "1px solid #ddd",
         fontWeight: 600,
-        justifyContent: "center",
+
+        // 👇 KEY FIX
+        justifyContent: {
+          xs: "flex-start", // mobile
+          md: "center",     // desktop
+        },
+
+        // 👇 smoother scroll UX
+        scrollBehavior: "smooth",
+
+        // 👇 hide scrollbar (optional clean UI)
+        "&::-webkit-scrollbar": {
+          display: "none",
+        },
       }}
     >
       {categories.map((cat) => (
@@ -30,6 +43,7 @@ export default function CategoryStrip() {
           sx={{
             cursor: "pointer",
             whiteSpace: "nowrap",
+            flexShrink: 0, // 👈 prevents shrinking
             "&:hover": { color: "#b1003a" },
           }}
         >
