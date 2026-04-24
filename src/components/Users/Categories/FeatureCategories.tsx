@@ -4,7 +4,6 @@ const categories = [
   "All Jewellery",
   "Gold",
   "Silver",
-  "Diamond",
   "Rings",
   "Earrings",
   "Chains",
