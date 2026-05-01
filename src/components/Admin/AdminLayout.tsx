@@ -29,7 +29,7 @@ export default function AdminLayout({ title, children }: any) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
 
-  const handleLogout = () => logout("/login");
+  const handleLogout = () => logout("/");
 
   const drawerWidth = isTablet ? 180 : 220;
 

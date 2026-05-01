@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     if (isTokenExpired(token)) {
-      logout("/login");
+      logout("/");
       return;
     }
 
@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(TOKEN_KEY, token);
     } catch (err) {
       console.error("Token decode failed", err);
-      logout("/login");
+      logout("/");
     }
   }, [token]);
 

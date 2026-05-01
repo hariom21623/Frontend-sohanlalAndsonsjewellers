@@ -29,8 +29,8 @@ export default function AppHeader() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleLogout = () => {
-    if (user?.adminRole) logout("/login");
-    else logout("/user");
+    if (user?.adminRole) logout("/");
+    
   };
 
   return (
