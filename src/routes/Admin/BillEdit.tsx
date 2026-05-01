@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import {
-  TextField, Button, Paper, Box, Typography
+  TextField,
+  Button,
+  Paper,
+  Box,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
 
 import { getBillById, updateBill } from "../../api/adminBill";
@@ -20,24 +25,34 @@ export default function BillEdit() {
   });
 
   const [item, setItem] = useState({ name: "", price: "", qty: 1 });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (!id) return;
+
+    const loadBill = async () => {
+      setLoading(true);
+      try {
+        const res = await getBillById(id);
+        const bill = res.bill;
+
+        setForm({
+          customerName: bill.customerName,
+          customerPhone: bill.customerPhone,
+          customerEmail: bill.customerEmail || "",
+          discount: bill.discount,
+          gstPercent: bill.gstPercent,
+          items: bill.items || [],
+        });
+      } catch (err) {
+        console.error("Failed to load bill", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadBill();
-  }, []);
-
-  async function loadBill() {
-    const res = await getBillById(id!);
-    const bill = res.bill;
-
-    setForm({
-      customerName: bill.customerName,
-      customerPhone: bill.customerPhone,
-      customerEmail: bill.customerEmail || "",
-      discount: bill.discount,
-      gstPercent: bill.gstPercent,
-      items: bill.items,
-    });
-  }
+  }, [id]);
 
   function addItem() {
     if (!item.name || !item.price) return;
@@ -51,9 +66,21 @@ export default function BillEdit() {
   }
 
   async function handleSubmit() {
-    await updateBill(id!, form);
-    alert("Bill Updated!");
-    navigate("/admin/bills");
+    try {
+      await updateBill(id!, form);
+      alert("Bill Updated!");
+      navigate("/admin/bills");
+    } catch (err) {
+      console.error("Update failed", err);
+    }
+  }
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
@@ -61,20 +88,28 @@ export default function BillEdit() {
       <Typography variant="h5">Edit Bill</Typography>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
-
-        <TextField label="Customer Name"
+        <TextField
+          label="Customer Name"
           value={form.customerName}
-          onChange={(e) => setForm({ ...form, customerName: e.target.value })}
+          onChange={(e) =>
+            setForm({ ...form, customerName: e.target.value })
+          }
         />
 
-        <TextField label="Customer Phone"
+        <TextField
+          label="Customer Phone"
           value={form.customerPhone}
-          onChange={(e) => setForm({ ...form, customerPhone: e.target.value })}
+          onChange={(e) =>
+            setForm({ ...form, customerPhone: e.target.value })
+          }
         />
 
-        <TextField label="Customer Email"
+        <TextField
+          label="Customer Email"
           value={form.customerEmail}
-          onChange={(e) => setForm({ ...form, customerEmail: e.target.value })}
+          onChange={(e) =>
+            setForm({ ...form, customerEmail: e.target.value })
+          }
         />
 
         {/* ITEMS */}
@@ -82,19 +117,35 @@ export default function BillEdit() {
           <Typography variant="subtitle1">Add Items</Typography>
 
           <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-            <TextField label="Item Name" value={item.name}
-              onChange={(e) => setItem({ ...item, name: e.target.value })}
+            <TextField
+              label="Item Name"
+              value={item.name}
+              onChange={(e) =>
+                setItem({ ...item, name: e.target.value })
+              }
             />
 
-            <TextField label="Price" type="number" value={item.price}
-              onChange={(e) => setItem({ ...item, price: e.target.value })}
+            <TextField
+              label="Price"
+              type="number"
+              value={item.price}
+              onChange={(e) =>
+                setItem({ ...item, price: e.target.value })
+              }
             />
 
-            <TextField label="Qty" type="number" value={item.qty}
-              onChange={(e) => setItem({ ...item, qty: Number(e.target.value) })}
+            <TextField
+              label="Qty"
+              type="number"
+              value={item.qty}
+              onChange={(e) =>
+                setItem({ ...item, qty: Number(e.target.value) })
+              }
             />
 
-            <Button variant="contained" onClick={addItem}>Add</Button>
+            <Button variant="contained" onClick={addItem}>
+              Add
+            </Button>
           </Box>
 
           {form.items.map((it: any, i: number) => (
@@ -104,7 +155,9 @@ export default function BillEdit() {
           ))}
         </Box>
 
-        <Button variant="contained" onClick={handleSubmit}>Save Changes</Button>
+        <Button variant="contained" onClick={handleSubmit}>
+          Save Changes
+        </Button>
       </Box>
     </Paper>
   );

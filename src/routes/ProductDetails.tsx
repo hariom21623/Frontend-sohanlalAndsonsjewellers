@@ -6,6 +6,7 @@ import {
   Button,
   Box,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProductById } from "../api/product";
@@ -31,16 +32,39 @@ export default function ProductDetails() {
         const res = await getProductById(id);
         setProduct(res.product || res);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load product", err);
       } finally {
         setLoading(false);
       }
     })();
   }, [id]);
 
-  if (!product) return <Container>Loading...</Container>;
+  // ✅ LOADING UI (fixes warning)
+  if (loading) {
+    return (
+      <Container sx={{ textAlign: "center", mt: 6 }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
-  const images = Array.isArray(product.images) ? product.images : [];
+  // ✅ NO PRODUCT
+  if (!product) {
+    return <Container sx={{ mt: 6 }}>Product not found</Container>;
+  }
+
+  // ✅ SAFE IMAGE HANDLING
+  let images: string[] = [];
+
+  if (Array.isArray(product.images)) {
+    images = product.images;
+  } else if (typeof product.images === "string") {
+    try {
+      images = JSON.parse(product.images);
+    } catch {
+      images = [product.images];
+    }
+  }
 
   const handleAdd = () => {
     if (!token) return navigate("/login");
@@ -57,7 +81,6 @@ export default function ProductDetails() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* MAIN FLEX WRAPPER */}
       <Box
         sx={{
           display: "flex",
@@ -65,7 +88,7 @@ export default function ProductDetails() {
           gap: 4,
         }}
       >
-        {/* LEFT IMAGE SECTION */}
+        {/* LEFT IMAGE */}
         <Box sx={{ flex: 1 }}>
           <Paper sx={{ p: 2 }}>
             {images.length > 0 ? (
@@ -83,13 +106,12 @@ export default function ProductDetails() {
               <Box sx={{ width: "100%", height: 420, background: "#eee" }} />
             )}
 
-            {/* Image thumbnails */}
             <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
-              {images.slice(0, 4).map((img: string, idx: number) => (
+              {images.slice(0, 4).map((img, idx) => (
                 <img
                   key={idx}
                   src={img}
-                  alt={"thumb-" + idx}
+                  alt={`thumb-${idx}`}
                   style={{
                     width: 80,
                     height: 80,
@@ -104,7 +126,7 @@ export default function ProductDetails() {
           </Paper>
         </Box>
 
-        {/* RIGHT INFO SECTION */}
+        {/* RIGHT INFO */}
         <Box sx={{ flex: 1 }}>
           <Typography variant="h5" fontWeight={600}>
             {product.name}
@@ -116,7 +138,7 @@ export default function ProductDetails() {
 
           <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
             <Typography variant="h6" color="primary">
-              ₹ {product.price.toFixed(2)}
+              ₹ {Number(product.price || 0).toFixed(2)}
             </Typography>
 
             <Chip
@@ -124,14 +146,16 @@ export default function ProductDetails() {
               sx={{ ml: 2, fontWeight: 600 }}
               size="small"
             />
+
             {product.subCategory && (
               <Chip label={product.subCategory} size="small" sx={{ ml: 1 }} />
             )}
           </Box>
 
-          <Typography sx={{ mt: 3 }}>{product.description}</Typography>
+          <Typography sx={{ mt: 3 }}>
+            {product.description || "No description available"}
+          </Typography>
 
-          {/* BUTTONS */}
           <Box sx={{ mt: 4, display: "flex", gap: 2 }}>
             <Button variant="contained" size="large" onClick={handleAdd}>
               Add to Cart

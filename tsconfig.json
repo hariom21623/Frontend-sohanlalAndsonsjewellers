@@ -2,6 +2,7 @@
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
     "target": "es5",
+    "types": ["node", "react", "react-dom"],
     "lib": [
       "dom",
       "dom.iterable",

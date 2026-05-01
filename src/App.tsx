@@ -1,23 +1,30 @@
-// src/App.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import AppHeader from "./components/AppHeader";
-import PWAInstallPrompt from "./components/PWAInstallPrompt";
+
+// Auth
 import { useAuth } from "./contexts/AuthProvider";
 
-// Pages
+// Public Pages
 import LoginPage from "./routes/LoginPage";
 import RegisterPage from "./routes/RegisterPage";
 import UserHome from "./routes/UserHome";
+
+// User
 import ProductDetails from "./routes/ProductDetails";
 
-// Admin
+// Admin Pages
 import UserList from "./routes/Admin/UserList";
-import UserCreate from "./routes/Admin/UserCreate";
 import UserEdit from "./routes/Admin/UserEdit";
+import UserCreate from "./routes/Admin/UserCreate";
 
-// Protected Routes
-import ProtectedRoute from "./contexts/ProtectedRoute";
-import AdminRoute from "./contexts/AdminRoute";
+import ProductList from "./routes/Admin/ProductList";
+import ProductCreate from "./routes/Admin/ProductCreate";
+import ProductEdit from "./routes/Admin/ProductEdit";
+
+import BillList from "./routes/Admin/BillList";
+import BillCreate from "./routes/Admin/BillCreate";
+import BillEdit from "./routes/Admin/BillEdit";
+import BillView from "./routes/Admin/BillView";
 
 export default function App() {
   const { token, user } = useAuth();
@@ -25,69 +32,55 @@ export default function App() {
   return (
     <>
       <AppHeader />
-      <PWAInstallPrompt />
 
       <Routes>
-        {/* PUBLIC */}
+        {/* ================= PUBLIC ================= */}
         <Route path="/login" element={<LoginPage />} />
+
         <Route path="/register" element={<RegisterPage />} />
+
+        {/* ================= USER ================= */}
+        <Route path="/" element={<UserHome />} />
         <Route path="/user" element={<UserHome />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
 
-        {/* PRODUCT (PROTECTED) */}
-        <Route
-          path="/product/:id"
-          element={
-            <ProtectedRoute>
-              <ProductDetails />
-            </ProtectedRoute>
-          }
-        />
+        {/* ================= ADMIN ================= */}
+        {/* (keeping unprotected as you said) */}
 
-        {/* ADMIN */}
-        <Route
-          path="/admin/users"
-          element={
-            <AdminRoute>
-              <UserList />
-            </AdminRoute>
-          }
-        />
+        {/* USERS */}
+        <Route path="/admin/users" element={<UserList />} />
+        <Route path="/admin/users/create" element={<UserCreate />} />
+        <Route path="/admin/users/edit/:id" element={<UserEdit />} />
 
-        <Route
-          path="/admin/users/create"
-          element={
-            <AdminRoute>
-              <UserCreate />
-            </AdminRoute>
-          }
-        />
+        {/* PRODUCTS */}
+        <Route path="/admin/products" element={<ProductList />} />
+        <Route path="/admin/products/create" element={<ProductCreate />} />
+        <Route path="/admin/products/edit/:id" element={<ProductEdit />} />
 
-        <Route
-          path="/admin/users/edit/:id"
-          element={
-            <AdminRoute>
-              <UserEdit />
-            </AdminRoute>
-          }
-        />
+        {/* BILLS */}
+        <Route path="/admin/bills" element={<BillList />} />
+        <Route path="/admin/bills/create" element={<BillCreate />} />
+        <Route path="/admin/bills/edit/:id" element={<BillEdit />} />
+        <Route path="/admin/bills/view/:id" element={<BillView />} />
 
-        {/* ROOT */}
+        {/* ================= ROOT ================= */}
         <Route
           path="/"
           element={
             token ? (
               user?.adminRole ? (
-                <Navigate to="/admin/users" />
+                <Navigate to="/admin/users" replace />
               ) : (
-                <Navigate to="/user" />
+                <Navigate to="/user" replace />
               )
             ) : (
-              <Navigate to="/user" />
+              <Navigate to="/login" replace />
             )
           }
         />
 
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* ================= FALLBACK ================= */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );

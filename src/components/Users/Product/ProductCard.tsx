@@ -25,7 +25,9 @@ export default function ProductCard({ product }: any) {
   const [open, setOpen] = useState(false);
 
   const image =
-    (product.images && product.images[0]) || "/placeholder.png";
+  Array.isArray(product.images) && product.images.length > 0
+    ? product.images[0]
+    : "/placeholder.png";
 
   const goLogin = (path: string) => {
     setOpen(true);

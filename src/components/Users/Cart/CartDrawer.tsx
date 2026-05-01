@@ -10,15 +10,14 @@ import {
   Avatar,
   ListItemText,
   Button,
-  Divider,
-  TextField
+  Divider
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useCart } from "../../../contexts/CartProvider";
 import { useNavigate } from "react-router-dom";
 
 export default function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void; }) {
-  const { items, updateQty, removeFromCart, total } = useCart();
+  const { items, removeFromCart, total } = useCart();
   const navigate = useNavigate();
 
   const proceed = () => {

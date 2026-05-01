@@ -34,49 +34,33 @@ export default function LoginPage() {
         navigate(from);
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || err?.message || "Login failed");
+      setError(err?.response?.data?.message || "Login failed");
     }
   }
 
   return (
     <Box
       sx={{
-        height: "calc(100vh - 64px)",   // 🔥 FIX HERE
+        height: "calc(100vh - 64px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         background: "#f5f5f5",
       }}
     >
-      <Paper
-        elevation={3}
-        sx={{
-          p: 4,
-          width: "100%",
-          maxWidth: 380,
-          borderRadius: 3,
-          boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Typography
-          variant="h5"
-          align="center"
-          gutterBottom
-          sx={{ fontWeight: 600 }}
-        >
+      <Paper sx={{ p: 4, width: "100%", maxWidth: 380 }}>
+        <Typography variant="h5" align="center" gutterBottom>
           Login
         </Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+        {error && <Alert severity="error">{error}</Alert>}
 
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
             label="Email"
             fullWidth
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             sx={{ mb: 2 }}
           />
 
@@ -84,31 +68,21 @@ export default function LoginPage() {
             label="Password"
             type="password"
             fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             sx={{ mb: 3 }}
           />
 
-          <Button
-            fullWidth
-            variant="contained"
-            sx={{
-              backgroundColor: "#d4af37",
-              color: "#000",
-              fontWeight: 600,
-              py: 1.2,
-            }}
-          >
+          <Button type="submit" fullWidth variant="contained">
             Login
           </Button>
         </Box>
 
         <Typography align="center" sx={{ mt: 2 }}>
           Don’t have an account?{" "}
-          <Link to="/register" style={{ color: "#d4af37" }}>
-            Register
-          </Link>
+          <Link to="/register">Register</Link>
         </Typography>
       </Paper>
     </Box>
-
   );
 }

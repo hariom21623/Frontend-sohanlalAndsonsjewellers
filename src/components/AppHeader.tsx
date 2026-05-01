@@ -91,7 +91,7 @@ export default function AppHeader() {
               </>
             ) : (
               <>
-                <Button color="inherit" onClick={() => navigate("/user")}>
+                <Button color="inherit" onClick={() => navigate("/")}>
                   Home
                 </Button>
                 <Button color="inherit" onClick={handleLogout}>
