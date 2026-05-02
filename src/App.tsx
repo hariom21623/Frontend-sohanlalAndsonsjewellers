@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AppHeader from "./components/AppHeader";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 // Auth
 import { useAuth } from "./contexts/AuthProvider";
@@ -32,6 +33,7 @@ export default function App() {
   return (
     <>
       <AppHeader />
+      <PWAInstallPrompt />
 
       <Routes>
         {/* ================= PUBLIC ================= */}
