@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import TanishqNavbar from "../components/Users/Navbar/MainNavbar";
 import CategoryStrip from "../components/Users/Categories/FeatureCategories";
 import FeaturedCollections from "../components/Users/Collections/FeaturedCollections";
@@ -8,9 +8,7 @@ import ProductFilters from "../components/Users/Product/ProductFilters";
 import ProductGrid from "../components/Users/Product/ProductGrid";
 import { Container, Box, CircularProgress } from "@mui/material";
 import { getAllPublic } from "../api/product";
-
 import CartDrawer from "../components/Users/Cart/CartDrawer";
-
 
 export default function UserHome() {
   const [products, setProducts] = useState<any[]>([]);
@@ -18,23 +16,24 @@ export default function UserHome() {
   const [filters, setFilters] = useState({ q: "", category: "all" });
   const [cartOpen, setCartOpen] = useState(false);
 
-  useEffect(() => {
-    loadProducts(filters);
-  }, [filters]);
-
-  async function loadProducts(params: any) {
+  // ✅ FIX: useCallback
+  const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getAllPublic(params);
-      setProducts(res.products);   // <-- ALWAYS valid now
+      const res = await getAllPublic(filters);
+      setProducts(res.products);
     } catch (err) {
       console.error("Failed to load products", err);
       setProducts([]);
     } finally {
       setLoading(false);
     }
-  }
+  }, [filters]);
 
+  // ✅ अब warning नहीं आएगी
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
 
   return (
     <>
