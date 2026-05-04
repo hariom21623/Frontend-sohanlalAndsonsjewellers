@@ -1,7 +1,6 @@
-// src/App.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
-
 import AppHeader from "./components/AppHeader";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 // Auth
 import { useAuth } from "./contexts/AuthProvider";
@@ -10,6 +9,9 @@ import { useAuth } from "./contexts/AuthProvider";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage from "./routes/RegisterPage";
 import UserHome from "./routes/UserHome";
+
+// User
+import ProductDetails from "./routes/ProductDetails";
 
 // Admin Pages
 import UserList from "./routes/Admin/UserList";
@@ -25,46 +27,45 @@ import BillCreate from "./routes/Admin/BillCreate";
 import BillEdit from "./routes/Admin/BillEdit";
 import BillView from "./routes/Admin/BillView";
 
-//User Pages
-import ProductDetails from "./routes/ProductDetails";
-
 export default function App() {
   const { token, user } = useAuth();
 
   return (
     <>
       <AppHeader />
+      <PWAInstallPrompt />
 
       <Routes>
-        {/* ---------- PUBLIC ROUTES ---------- */}
-        <Route
-          path="/login"
-          element={!token ? <LoginPage /> : <Navigate to="/" replace />}
-        />
+        {/* ================= PUBLIC ================= */}
+        <Route path="/login" element={<LoginPage />} />
 
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* ---------- USER HOME ---------- */}
+        {/* ================= USER ================= */}
+        <Route path="/" element={<UserHome />} />
         <Route path="/user" element={<UserHome />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
 
-        {/* ---------- ADMIN ROUTES (TEMPORARILY UNPROTECTED) ---------- */}
+        {/* ================= ADMIN ================= */}
+        {/* (keeping unprotected as you said) */}
+
+        {/* USERS */}
         <Route path="/admin/users" element={<UserList />} />
         <Route path="/admin/users/create" element={<UserCreate />} />
         <Route path="/admin/users/edit/:id" element={<UserEdit />} />
 
+        {/* PRODUCTS */}
         <Route path="/admin/products" element={<ProductList />} />
         <Route path="/admin/products/create" element={<ProductCreate />} />
         <Route path="/admin/products/edit/:id" element={<ProductEdit />} />
 
+        {/* BILLS */}
         <Route path="/admin/bills" element={<BillList />} />
         <Route path="/admin/bills/create" element={<BillCreate />} />
         <Route path="/admin/bills/edit/:id" element={<BillEdit />} />
         <Route path="/admin/bills/view/:id" element={<BillView />} />
 
-        //User Product Details
-        <Route path="/product/:id" element={<ProductDetails />} />
-
-        {/* ---------- ROOT REDIRECT ---------- */}
+        {/* ================= ROOT ================= */}
         <Route
           path="/"
           element={
@@ -80,7 +81,7 @@ export default function App() {
           }
         />
 
-        {/* ---------- FALLBACK ---------- */}
+        {/* ================= FALLBACK ================= */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

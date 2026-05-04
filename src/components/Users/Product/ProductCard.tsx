@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardMedia,
@@ -7,34 +7,44 @@ import {
   CardActions,
   Button,
   Box,
+  Snackbar,
+  Alert,
+  Chip,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useAuth } from "../../../contexts/AuthProvider";
 import { useCart } from "../../../contexts/CartProvider";
 
-type Product = any;
-
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product }: any) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { token } = useAuth();
   const { addToCart } = useCart();
 
+  const [open, setOpen] = useState(false);
+
   const image =
-    (product.images && Array.isArray(product.images) && product.images[0]) ||
-    "/placeholder.png";
+    Array.isArray(product.images) && product.images.length > 0
+      ? product.images[0]
+      : "/placeholder.png";
+
+  const goLogin = (path: string) => {
+    setOpen(true);
+    setTimeout(() => {
+      navigate("/login", { state: { from: path } });
+    }, 1200);
+  };
 
   const handleView = () => {
+    if (!token) return goLogin(`/product/${product.id}`);
     navigate(`/product/${product.id}`);
   };
 
   const handleAdd = () => {
-    if (!token) {
-      // redirect to login / show modal
-      navigate("/login");
-      return;
-    }
+    if (!token) return goLogin(location.pathname);
+
     addToCart({
       productId: product.id,
       name: product.name,
@@ -45,42 +55,76 @@ export default function ProductCard({ product }: { product: Product }) {
     });
   };
 
+  const formatCategory = (cat: string) => {
+    if (cat === "1Gram Gold Polished Jewellery") return "1 Gram Gold";
+    return cat;
+  };
+
   return (
-    <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <CardMedia
-        component="img"
-        height="180"
-        image={image}
-        alt={product.name}
-        sx={{ objectFit: "cover" }}
-      />
-      <CardContent sx={{ flex: "1 1 auto" }}>
-        <Typography variant="subtitle1" gutterBottom>
-          {product.name}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {product.subCategory || product.category}
-        </Typography>
-        <Box sx={{ mt: 1 }}>
-          <Typography variant="h6">₹{product.price?.toFixed?.(2) ?? product.price}</Typography>
-        </Box>
-      </CardContent>
+    <>
+      <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        <CardMedia component="img" height="180" image={image} />
 
-      <CardActions>
-        <Button size="small" startIcon={<VisibilityIcon />} onClick={handleView}>
-          View
-        </Button>
+        <CardContent sx={{ flex: 1 }}>
+          <Typography variant="subtitle1" fontWeight={600}>
+            {product.name}
+          </Typography>
 
-        <Button
-          size="small"
-          variant="contained"
-          startIcon={<AddShoppingCartIcon />}
-          onClick={handleAdd}
-          disabled={product.stock <= 0}
-        >
-          {product.stock <= 0 ? "Out of stock" : "Add"}
-        </Button>
-      </CardActions>
-    </Card>
+          {/* ✅ CATEGORY BADGE */}
+          <Box sx={{ mt: 1 }}>
+            <Chip
+              label={formatCategory(product.category)}
+              size="small"
+              sx={{
+                mt: 1,
+                maxWidth: "100%",
+                whiteSpace: "normal",      // ✅ wrap allow
+                height: "auto",
+                "& .MuiChip-label": {
+                  display: "block",
+                  whiteSpace: "normal",
+                  lineHeight: 1.2,
+                  px: 1,
+                  py: 0.5,
+                  textAlign: "center",
+                },
+              }}
+            />
+          </Box>
+
+          {/* ✅ SUB CATEGORY */}
+          {product.subCategory && (
+            <Typography variant="caption" color="text.secondary">
+              {product.subCategory}
+            </Typography>
+          )}
+
+          <Typography variant="h6" sx={{ mt: 1 }}>
+            ₹{product.price}
+          </Typography>
+        </CardContent>
+
+        <CardActions>
+          <Button onClick={handleView} startIcon={<VisibilityIcon />}>
+            View
+          </Button>
+
+          <Button
+            onClick={handleAdd}
+            startIcon={<AddShoppingCartIcon />}
+            disabled={product.stock <= 0}
+            variant="contained"
+          >
+            {product.stock <= 0 ? "Out of stock" : "Add"}
+          </Button>
+        </CardActions>
+      </Card>
+
+      <Snackbar open={open} autoHideDuration={2000} onClose={() => setOpen(false)}>
+        <Alert severity="warning" variant="filled">
+          Please login first
+        </Alert>
+      </Snackbar>
+    </>
   );
 }

@@ -1,19 +1,25 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import { useAuth } from '../contexts/AuthProvider';
+import React, { useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Paper,
+} from "@mui/material";
+import { useAuth } from "../contexts/AuthProvider";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from || "/user";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,51 +28,61 @@ export default function LoginPage() {
     try {
       const loggedInUser = await login({ email, password });
 
-      // *** REDIRECT BASED ON ROLE ***
-      if (loggedInUser.adminRole === true) {
-        navigate('/admin/users');
+      if (loggedInUser.adminRole) {
+        navigate("/admin/users");
       } else {
-        navigate('/user');
+        navigate(from);
       }
-
     } catch (err: any) {
-      console.error(err);
-      setError(err?.response?.data?.message || err?.message || "Login failed");
+      setError(err?.response?.data?.message || "Login failed");
     }
   }
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 480, mx: 'auto' }}>
-      <Typography variant="h5" gutterBottom>
-        Login
-      </Typography>
+    <Box
+      sx={{
+        height: "calc(100vh - 64px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#f5f5f5",
+      }}
+    >
+      <Paper sx={{ p: 4, width: "100%", maxWidth: 380 }}>
+        <Typography variant="h5" align="center" gutterBottom>
+          Login
+        </Typography>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
+        {error && <Alert severity="error">{error}</Alert>}
 
-      <TextField
-        label="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
+        <Box component="form" onSubmit={handleSubmit}>
+          <TextField
+            label="Email"
+            fullWidth
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            sx={{ mb: 2 }}
+          />
 
-      <TextField
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
+          <TextField
+            label="Password"
+            type="password"
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            sx={{ mb: 3 }}
+          />
 
-      <Button variant="contained" type="submit" fullWidth>
-        Login
-      </Button>
+          <Button type="submit" fullWidth variant="contained">
+            Login
+          </Button>
+        </Box>
+
+        <Typography align="center" sx={{ mt: 2 }}>
+          Don’t have an account?{" "}
+          <Link to="/register">Register</Link>
+        </Typography>
+      </Paper>
     </Box>
   );
 }

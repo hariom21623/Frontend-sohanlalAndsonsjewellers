@@ -1,38 +1,53 @@
 import axiosInstance from "./axios";
 
-export const createProduct = (data: any) =>
-  axiosInstance.post("/product/addProduct", data).then((r) => r.data);
+// ================= PUBLIC =================
 
+export const getAllPublic = async (filters: { q: string; category: string }) => {
+  const res = await axiosInstance.get("/product/public/getAllProduct", {
+    params: {
+      q: filters.q,
+      category: filters.category,
+    },
+  });
 
-export const getAllProducts = (params?: Record<string, any>) =>
-  axiosInstance
-    .get("/product/getAllProduct", { params })
-    .then((r) => {
-      return {
-        products: r.data.products || [],
-      };
-    });
+  return {
+    products: res.data.products || [],
+    banners: res.data.banners || [],
+    featured: res.data.featured || null,
+  };
+};
 
+export const getByIdPublic = async (id: string) => {
+  const res = await axiosInstance.get(`/product/public/getById/${id}`);
+  return res.data;
+};
 
-export const getProductById = (id: string) =>
-  axiosInstance.get(`/product/getById/${id}`).then((r) => r.data);
+// ================= ADMIN =================
 
-export const updateProduct = (id: string, data: any) =>
-  axiosInstance.put(`/product/updateById/${id}`, data).then((r) => r.data);
+export const getAllProducts = async () => {
+  const res = await axiosInstance.get("/product/getAllProduct");
 
-export const deleteProduct = (id: string) =>
-  axiosInstance.delete(`/product/delete/${id}`).then((r) => r.data);
+  return {
+    products: res.data.products || [],
+  };
+};
 
-//User List Api
-export  const getAllPublic = (params?: Record<string, any>) =>
-  axiosInstance
-    .get("/product/public/getAllProduct", { params })
-    .then((r) => {
-      return {
-        products: r.data.products || [],
-      };
-    });
+export const getProductById = async (id: string) => {
+  const res = await axiosInstance.get(`/product/getById/${id}`);
+  return res.data;
+};
 
+export const createProduct = async (data: any) => {
+  const res = await axiosInstance.post("/product/addProduct", data);
+  return res.data;
+};
 
-export const getByIdPublic = (id: string) =>
-  axiosInstance.get(`/product/public/getById/${id}`).then((r) => r.data);
+export const updateProduct = async (id: string, data: any) => {
+  const res = await axiosInstance.put(`/product/updateById/${id}`, data);
+  return res.data;
+};
+
+export const deleteProduct = async (id: string) => {
+  const res = await axiosInstance.delete(`/product/delete/${id}`);
+  return res.data;
+};

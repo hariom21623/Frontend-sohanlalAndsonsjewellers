@@ -2,7 +2,6 @@ import {
   AppBar,
   Toolbar,
   Box,
-  Typography,
   IconButton,
   InputBase,
 } from "@mui/material";
@@ -11,11 +10,26 @@ import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import PersonIcon from "@mui/icons-material/Person";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-export default function MainNavbar() {
+export default function MainNavbar({
+  onSearch,
+}: {
+  onSearch?: (q: string) => void;
+}) {
   const navigate = useNavigate();
+  const [q, setQ] = useState("");
 
   const goLogin = () => navigate("/login");
+
+  // ✅ Updated debounce logic with robust cleanup
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      onSearch?.(q);
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [q, onSearch]);
 
   return (
     <AppBar
@@ -27,41 +41,28 @@ export default function MainNavbar() {
       }}
     >
       <Toolbar sx={{ display: "flex", flexDirection: "column", py: 1 }}>
-        
-        {/* LOGO */}
-        {/* <Typography
-          sx={{
-            fontFamily: "serif",
-            fontSize: 32,
-            fontWeight: 600,
-            mb: 1,
-            cursor: "pointer",
-          }}
-          onClick={() => navigate("/user")}
-        >
-          Sohan Lal & Sons Jewellers
-        </Typography> */}
-
-        {/* SEARCH BAR */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            width: "70%",
+            width: { xs: "95%", md: "60%" },
             background: "#f1f1f1",
             borderRadius: 50,
-            p: 1,
+            px: 2,
+            py: 1,
             mb: 1,
           }}
         >
-          <SearchIcon sx={{ ml: 1, color: "#444" }} />
+          <SearchIcon sx={{ color: "#444" }} />
+
           <InputBase
-            placeholder="Search for Gold, Silver, Diamond jewellery..."
+            placeholder="Search jewellery..."
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
             sx={{ ml: 1, flex: 1 }}
           />
         </Box>
 
-        {/* ICONS */}
         <Box sx={{ display: "flex", gap: 3 }}>
           <IconButton onClick={goLogin}>
             <PersonIcon />

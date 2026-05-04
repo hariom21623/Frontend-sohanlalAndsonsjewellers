@@ -1,60 +1,74 @@
-import React, { useEffect, useState } from "react";
-import TanishqNavbar from "../components/Users/Navbar/MainNavbar";
-import CategoryStrip from "../components/Users/Categories/FeatureCategories";
+import { useCallback, useEffect, useState } from "react";
+import MainNavbar from "../components/Users/Navbar/MainNavbar";
+import HomeBanner from "../components/Users/Banner/HomeBanner";
+import CategoryStrip from "../components/Users/Categories/CategoryStrip";
 import FeaturedCollections from "../components/Users/Collections/FeaturedCollections";
-import TrendingSlider from "../components/Users/Trending/TrendingSlider";
 import UserFooter from "../components/Users/Footer/MainFooter";
-import ProductFilters from "../components/Users/Product/ProductFilters";
 import ProductGrid from "../components/Users/Product/ProductGrid";
-import { Container, Box, CircularProgress } from "@mui/material";
+import { Container, Box, CircularProgress, Typography } from "@mui/material";
 import { getAllPublic } from "../api/product";
-
 import CartDrawer from "../components/Users/Cart/CartDrawer";
-
 
 export default function UserHome() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({ q: "", category: "all" });
+
+  const [filters, setFilters] = useState({
+    q: "",
+    category: "all",
+  });
+
   const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
-    loadProducts(filters);
+    let active = true;
+
+    async function fetchProducts() {
+      setLoading(true);
+      try {
+        const res = await getAllPublic(filters);
+        if (active) setProducts(res.products || []);
+      } catch (err) {
+        console.error(err);
+        if (active) setProducts([]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    fetchProducts();
+
+    return () => {
+      active = false;
+    };
   }, [filters]);
 
-  async function loadProducts(params: any) {
-    setLoading(true);
-    try {
-      const res = await getAllPublic(params);
-      setProducts(res.products);   // <-- ALWAYS valid now
-    } catch (err) {
-      console.error("Failed to load products", err);
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const handleSearch = useCallback((q: string) => {
+    setFilters((prev) => (prev.q === q ? prev : { ...prev, q }));
+  }, []);
 
+  const handleCategory = useCallback((cat: string) => {
+    setFilters((prev) => (prev.category === cat ? prev : { ...prev, category: cat }));
+  }, []);
 
   return (
     <>
-      <TanishqNavbar />
-      <CategoryStrip />
+      <MainNavbar onSearch={handleSearch} />
 
+      <CategoryStrip onSelect={handleCategory} />
+
+      {/* 🔥 Banner */}
+      <HomeBanner category={filters.category} />
+
+      {/* 🔥 Products displayed horizontally */}
       <Container maxWidth="lg" sx={{ mt: 3 }}>
-        <ProductFilters
-          onFilter={(vals) =>
-            setFilters({
-              q: vals.q ?? "",
-              category: vals.category ?? "all",
-            })
-          }
-          initial={filters}
-        />
-
         {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
+          <Box sx={{ textAlign: "center", mt: 6 }}>
             <CircularProgress />
+          </Box>
+        ) : products.length === 0 ? (
+          <Box sx={{ textAlign: "center", mt: 6 }}>
+            <Typography>No Products Available</Typography>
           </Box>
         ) : (
           <ProductGrid products={products} />
@@ -62,7 +76,6 @@ export default function UserHome() {
       </Container>
 
       <FeaturedCollections />
-      <TrendingSlider />
       <UserFooter />
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />

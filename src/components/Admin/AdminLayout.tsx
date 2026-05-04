@@ -8,123 +8,108 @@ import {
   Drawer,
   Menu,
   MenuItem,
-  useMediaQuery,
   Button,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import { useAuth } from "../../contexts/AuthProvider";
 
 export default function AdminLayout({ title, children }: any) {
   const navigate = useNavigate();
-  const isMobile = useMediaQuery("(max-width: 900px)");
+  const { logout } = useAuth();
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [menuAnchor, setMenuAnchor] = useState<Element | null>(null);
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const handleLogout = () => logout("/");
+
+  const drawerWidth = isTablet ? 180 : 220;
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-      {/* ────────────────────────────────
-                TOP NAVBAR
-      ──────────────────────────────── */}
+    <Box sx={{ display: "flex" }}>
+      {/* APPBAR */}
       <AppBar position="fixed">
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          {/* LEFT SIDE — MENU BUTTON (ONLY MOBILE) */}
-          {isMobile && (
-            <IconButton
-              color="inherit"
-              edge="start"
-              onClick={() => setDrawerOpen(true)}
-            >
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          {(isMobile || isTablet) && (
+            <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
               <MenuIcon />
             </IconButton>
           )}
 
-          {/* TITLE */}
           <Typography variant="h6">{title}</Typography>
 
-          {/* RIGHT SIDE OPTIONS */}
-          {/* DESKTOP → Buttons */}
-          {!isMobile && (
+          {/* DESKTOP */}
+          {!isMobile && !isTablet && (
             <Box>
-              <Button
-                sx={{ color: "#fff", mr: 1 }}
-                onClick={() => navigate("/")}
-              >
-                HomePage
-              </Button>
-              <Button sx={{ color: "#fff" }} onClick={() => navigate("/logout")}>
+              {/* <Button color="inherit" onClick={() => navigate("/")}>
+                Home
+              </Button> */}
+              <Button color="inherit" onClick={handleLogout}>
                 Logout
               </Button>
             </Box>
           )}
 
-          {/* MOBILE → ⋮ Menu */}
-          {isMobile && (
+          {/* MOBILE + TABLET MENU */}
+          {(isMobile || isTablet) && (
             <>
-              <IconButton
-                color="inherit"
-                onClick={(e) => setMenuAnchor(e.currentTarget)}
-              >
-                <MoreVertIcon />
+              <IconButton onClick={(e) => setMenuAnchor(e.currentTarget)}>
+                <MoreVertIcon sx={{ color: "#fff" }} />
               </IconButton>
 
               <Menu
-                open={Boolean(menuAnchor)}
                 anchorEl={menuAnchor}
+                open={Boolean(menuAnchor)}
                 onClose={() => setMenuAnchor(null)}
               >
-                <MenuItem onClick={() => navigate("/")}>HomePage</MenuItem>
-                <MenuItem onClick={() => navigate("/logout")}>Logout</MenuItem>
+                <MenuItem onClick={() => navigate("/")}>Home</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </>
           )}
         </Toolbar>
       </AppBar>
 
-      {/* ────────────────────────────────
-                SIDEBAR
-      ──────────────────────────────── */}
-
-      {/* DESKTOP — Fixed Sidebar */}
-      {!isMobile && (
+      {/* SIDEBAR DESKTOP */}
+      {!isMobile && !isTablet && (
         <Box
           sx={{
-            width: 220,
-            height: "100vh",
-            borderRight: "1px solid #ddd",
-            position: "fixed",
-            left: 0,
-            top: 64,
+            width: drawerWidth,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+            },
           }}
         >
           <Sidebar />
         </Box>
       )}
 
-      {/* MOBILE — Drawer Sidebar */}
-      {isMobile && (
+      {/* DRAWER MOBILE + TABLET */}
+      {(isMobile || isTablet) && (
         <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          <Box sx={{ width: 240 }}>
+          <Box sx={{ width: drawerWidth }}>
             <Sidebar />
           </Box>
         </Drawer>
       )}
 
-      {/* ────────────────────────────────
-                PAGE CONTENT
-      ──────────────────────────────── */}
-
+      {/* CONTENT */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: isMobile ? 2 : 3,
           mt: 8,
-          ml: isMobile ? 0 : "220px",
-          overflowY: "auto",
-          width: "100%",
+          ml: !isMobile && !isTablet ? `${drawerWidth}px` : 0,
         }}
       >
         {children}
