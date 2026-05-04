@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, MenuItem } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  MenuItem,
+  Snackbar,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import imageCompression from "browser-image-compression";
 import { createProduct } from "../../api/product";
@@ -21,41 +29,57 @@ export default function ProductCreate() {
     stock: "",
   });
 
-  // ✅ Only previews needed (base64)
   const [previews, setPreviews] = useState<string[]>([]);
 
-  function change(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  // 🔥 NEW STATES
+  const [uploading, setUploading] = useState(false);
+  const [openSnack, setOpenSnack] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  function change(e: any) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const selected = e.target.files ? Array.from(e.target.files) : [];
-    if (selected.length === 0) return;
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (!files.length) return;
+
+    setUploading(true);
+    setProgress(0);
 
     const previewUrls: string[] = [];
 
-    for (const f of selected) {
-      const compressed = await imageCompression(f, {
-        maxSizeMB: 0.2,
-        maxWidthOrHeight: 1200,
-        useWebWorker: true,
-      });
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
-      const dataUrl = await toDataUrl(compressed);
-      previewUrls.push(dataUrl);
+      try {
+        const compressed = await imageCompression(file, {
+          maxSizeMB: 0.05, // ✅ better quality
+          maxWidthOrHeight: 800,
+          useWebWorker: true,
+          initialQuality: 0.7,
+          onProgress: (p) => setProgress(Math.round(p)),
+        });
+
+        const dataUrl = await toDataUrl(compressed);
+        previewUrls.push(dataUrl);
+
+      } catch (err) {
+        console.error("Compression error:", err);
+      }
     }
 
-    setPreviews((prev) => prev.concat(previewUrls));
+    setPreviews((prev) => [...prev, ...previewUrls]);
+
+    setUploading(false);
+    setOpenSnack(true); // ✅ popup
   }
 
   async function handleSubmit() {
     const payload = {
-      name: form.name,
-      category: form.category,
-      subCategory: form.subCategory,
+      ...form,
       price: Number(form.price || 0),
       weight: Number(form.weight || 0),
-      description: form.description || "",
       stock: Number(form.stock || 0),
       images: previews,
     };
@@ -73,6 +97,7 @@ export default function ProductCreate() {
   return (
     <AdminLayout title="Create Product">
       <Box sx={{ maxWidth: 600 }}>
+
         <TextField fullWidth name="name" label="Name" sx={{ mb: 2 }} onChange={change} />
 
         <TextField select fullWidth name="category" label="Category" sx={{ mb: 2 }} onChange={change}>
@@ -91,18 +116,32 @@ export default function ProductCreate() {
         <TextField fullWidth name="weight" label="Weight" type="number" sx={{ mb: 2 }} onChange={change} />
         <TextField fullWidth name="stock" label="Stock" type="number" sx={{ mb: 2 }} onChange={change} />
 
-        <Button variant="outlined" component="label" sx={{ mb: 2 }}>
-          Select Images
+        {/* 🔥 FILE BUTTON */}
+        <Button
+          variant="outlined"
+          component="label"
+          sx={{ mb: 2 }}
+          disabled={uploading}
+        >
+          {uploading ? "Uploading..." : "Select Images"}
           <input hidden type="file" multiple accept="image/*" onChange={onFileChange} />
         </Button>
 
-        {/* ✅ FIX: added alt */}
+        {/* 🔥 LOADER */}
+        {uploading && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+            <CircularProgress size={24} />
+            <span>{progress}% Compressing...</span>
+          </Box>
+        )}
+
+        {/* PREVIEW */}
         <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
           {previews.map((src, i) => (
             <img
               key={i}
               src={src}
-              alt={`preview-${i}`}   // ✅ FIX
+              alt={`preview-${i}`}
               width={80}
               height={80}
               style={{ objectFit: "cover", borderRadius: 6 }}
@@ -120,10 +159,25 @@ export default function ProductCreate() {
           onChange={change}
         />
 
-        <Button variant="contained" onClick={handleSubmit}>
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={uploading}
+        >
           Create Product
         </Button>
       </Box>
+
+      {/* 🔥 SUCCESS POPUP */}
+      <Snackbar
+        open={openSnack}
+        autoHideDuration={2000}
+        onClose={() => setOpenSnack(false)}
+      >
+        <Alert severity="success" variant="filled">
+          Images uploaded successfully
+        </Alert>
+      </Snackbar>
     </AdminLayout>
   );
 }

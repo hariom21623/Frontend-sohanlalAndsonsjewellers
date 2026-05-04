@@ -9,6 +9,7 @@ import {
   Box,
   Snackbar,
   Alert,
+  Chip,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -25,15 +26,15 @@ export default function ProductCard({ product }: any) {
   const [open, setOpen] = useState(false);
 
   const image =
-  Array.isArray(product.images) && product.images.length > 0
-    ? product.images[0]
-    : "/placeholder.png";
+    Array.isArray(product.images) && product.images.length > 0
+      ? product.images[0]
+      : "/placeholder.png";
 
   const goLogin = (path: string) => {
     setOpen(true);
     setTimeout(() => {
       navigate("/login", { state: { from: path } });
-    }, 1500);
+    }, 1200);
   };
 
   const handleView = () => {
@@ -54,22 +55,53 @@ export default function ProductCard({ product }: any) {
     });
   };
 
+  const formatCategory = (cat: string) => {
+    if (cat === "1Gram Gold Polished Jewellery") return "1 Gram Gold";
+    return cat;
+  };
+
   return (
     <>
       <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <CardMedia component="img" height="180" image={image} />
 
         <CardContent sx={{ flex: 1 }}>
-          <Typography variant="subtitle1">{product.name}</Typography>
-          <Typography variant="body2">
-            {product.subCategory || product.category}
+          <Typography variant="subtitle1" fontWeight={600}>
+            {product.name}
           </Typography>
 
+          {/* ✅ CATEGORY BADGE */}
           <Box sx={{ mt: 1 }}>
-            <Typography variant="h6">
-              ₹{product.price}
-            </Typography>
+            <Chip
+              label={formatCategory(product.category)}
+              size="small"
+              sx={{
+                mt: 1,
+                maxWidth: "100%",
+                whiteSpace: "normal",      // ✅ wrap allow
+                height: "auto",
+                "& .MuiChip-label": {
+                  display: "block",
+                  whiteSpace: "normal",
+                  lineHeight: 1.2,
+                  px: 1,
+                  py: 0.5,
+                  textAlign: "center",
+                },
+              }}
+            />
           </Box>
+
+          {/* ✅ SUB CATEGORY */}
+          {product.subCategory && (
+            <Typography variant="caption" color="text.secondary">
+              {product.subCategory}
+            </Typography>
+          )}
+
+          <Typography variant="h6" sx={{ mt: 1 }}>
+            ₹{product.price}
+          </Typography>
         </CardContent>
 
         <CardActions>

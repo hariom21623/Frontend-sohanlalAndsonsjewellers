@@ -1,33 +1,61 @@
-import React, { useState } from "react";
-import { Box, TextField, Select, MenuItem, Button } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Button, InputBase } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function ProductFilters({
   initial,
   onFilter,
 }: {
-  initial?: { q: string; category: string };
-  onFilter: (vals: { q?: string; category?: string }) => void;
+  initial?: { q: string };
+  onFilter: (vals: { q?: string }) => void;
 }) {
-  const [q, setQ] = useState(initial?.q ?? "");
-  const [category, setCategory] = useState(initial?.category ?? "all");
+  const [q, setQ] = useState("");
+
+  // 🔁 sync initial value
+  useEffect(() => {
+    if (initial?.q !== undefined) {
+      setQ(initial.q);
+    }
+  }, [initial]);
+
+  // 🔥 AUTO SEARCH (debounce)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onFilter({ q });
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [q, onFilter]);
 
   return (
-    <Box sx={{ display: "flex", gap: 2, alignItems: "center", mt: 2 }}>
-      <TextField
-        placeholder="Search products..."
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        size="small"
-      />
-      <Select value={category} onChange={(e) => setCategory(e.target.value)} size="small">
-        <MenuItem value="all">All</MenuItem>
-        <MenuItem value="Gold">Gold</MenuItem>
-        <MenuItem value="Silver">Silver</MenuItem>
-        <MenuItem value="Diamond">1Gram Gold Polished Jewellery</MenuItem>
-      </Select>
+    <Box sx={{ mt: 2 }}>
+      {/* 🔍 SEARCH BAR */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          background: "#f1f1f1",
+          borderRadius: "50px",
+          px: 2,
+          py: 1,
+        }}
+      >
+        <SearchIcon sx={{ color: "#444" }} />
 
-      <Button variant="contained" onClick={() => onFilter({ q, category })}>Apply</Button>
-      <Button onClick={() => { setQ(""); setCategory("all"); onFilter({ q: "", category: "all" }); }}>Reset</Button>
+        <InputBase
+          placeholder="Search for Gold, Silver jewellery..."
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          sx={{ ml: 1, flex: 1 }}
+        />
+
+        {q && (
+          <Button size="small" onClick={() => setQ("")}>
+            RESET
+          </Button>
+        )}
+      </Box>
     </Box>
   );
 }

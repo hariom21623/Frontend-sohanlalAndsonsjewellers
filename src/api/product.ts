@@ -2,16 +2,23 @@ import axiosInstance from "./axios";
 
 // ================= PUBLIC =================
 
-export const getAllPublic = async (filters: { q: string; category: string; }) => {
-  const res = await axiosInstance.get("/product/public/products");
+export const getAllPublic = async (filters: { q: string; category: string }) => {
+  const res = await axiosInstance.get("/product/public/getAllProduct", {
+    params: {
+      q: filters.q,
+      category: filters.category,
+    },
+  });
 
   return {
     products: res.data.products || [],
+    banners: res.data.banners || [],
+    featured: res.data.featured || null,
   };
 };
 
 export const getByIdPublic = async (id: string) => {
-  const res = await axiosInstance.get(`/product/public/products/${id}`);
+  const res = await axiosInstance.get(`/product/public/getById/${id}`);
   return res.data;
 };
 

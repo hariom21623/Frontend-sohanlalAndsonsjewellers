@@ -60,7 +60,8 @@ export default function PWAInstallPrompt() {
         <div style={styles.container}>
           <button style={styles.close} onClick={handleClose}>×</button>
           <p style={styles.text}>
-            Install Sohan Lal & Sons Jewellers
+            {/* Install Sohan Lal & Sons Jewellers */}
+            सोहन लाल एंड संस ज्वैलर्स को स्थापित करें
           </p>
           <button style={styles.button} onClick={handleInstall}>
             Install App

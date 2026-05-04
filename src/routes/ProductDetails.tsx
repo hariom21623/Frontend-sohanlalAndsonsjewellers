@@ -5,118 +5,158 @@ import {
   Typography,
   Button,
   Box,
-  CircularProgress,
+  IconButton,
+  Chip,
 } from "@mui/material";
+import {
+  ArrowBackIos,
+  ArrowForwardIos,
+  ArrowBack,
+} from "@mui/icons-material";
 import { useParams, useNavigate } from "react-router-dom";
-import { getByIdPublic } from "../api/product"; // ✅ FIXED
-import { useAuth } from "../contexts/AuthProvider";
-import { useCart } from "../contexts/CartProvider";
+import { getByIdPublic } from "../api/product";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [product, setProduct] = useState<any | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const { token } = useAuth();
-  const { addToCart } = useCart();
+  const [product, setProduct] = useState<any>(null);
+  const [images, setImages] = useState<string[]>([]);
+  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
     if (!id) return;
 
     (async () => {
-      setLoading(true);
-      try {
-        const res = await getByIdPublic(id!); // ✅ FIXED
-        setProduct(res.product);
-      } catch (err) {
-        console.error("Failed to load product", err);
-      } finally {
-        setLoading(false);
+      const res = await getByIdPublic(id);
+      const data = res.product;
+
+      setProduct(data);
+
+      let imgs: string[] = [];
+
+      if (Array.isArray(data.images)) imgs = data.images;
+      else if (typeof data.images === "string") {
+        try {
+          imgs = JSON.parse(data.images);
+        } catch {
+          imgs = [data.images];
+        }
       }
+
+      setImages(imgs);
     })();
   }, [id]);
 
-  if (loading) {
-    return (
-      <Container sx={{ textAlign: "center", mt: 6 }}>
-        <CircularProgress />
-      </Container>
-    );
-  }
-
-  if (!product) {
-    return <Container sx={{ mt: 6 }}>Product not found</Container>;
-  }
-
-  let images: string[] = [];
-
-  if (Array.isArray(product.images)) {
-    images = product.images;
-  } else if (typeof product.images === "string") {
-    try {
-      images = JSON.parse(product.images);
-    } catch {
-      images = [product.images];
-    }
-  }
-
-  const handleAdd = () => {
-    if (!token) return navigate("/login");
-
-    addToCart({
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      qty: 1,
-      image: images[0] || "/placeholder.png",
-      sku: product.sku,
-    });
+  const next = () => {
+    if (current < images.length - 1) setCurrent(current + 1);
   };
 
+  const prev = () => {
+    if (current > 0) setCurrent(current - 1);
+  };
+
+  const formatCategory = (cat: string) => {
+    if (cat === "1Gram Gold Polished Jewellery") return "1 Gram Gold";
+    return cat;
+  };
+
+  if (!product) return <div>Loading...</div>;
+
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 4,
-        }}
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
+      
+      {/* 🔥 BACK BUTTON */}
+      <Button
+        startIcon={<ArrowBack />}
+        onClick={() => navigate(-1)}
+        sx={{ mb: 2 }}
       >
-        <Box sx={{ flex: 1 }}>
-          <Paper sx={{ p: 2 }}>
-            <img
-              src={images[0] || "/placeholder.png"}
-              alt={product.name}
-              style={{
-                width: "100%",
-                height: "420px",
-                objectFit: "cover",
-              }}
-            />
-          </Paper>
+        Back
+      </Button>
+
+      <Paper sx={{ p: 2, textAlign: "center", position: "relative" }}>
+
+        {/* LEFT */}
+        {images.length > 1 && (
+          <IconButton
+            onClick={prev}
+            disabled={current === 0}
+            sx={{ position: "absolute", top: "50%", left: 10 }}
+          >
+            <ArrowBackIos />
+          </IconButton>
+        )}
+
+        {/* IMAGE */}
+        <Box
+          sx={{
+            height: 350,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <img
+            src={images[current] || "/placeholder.png"}
+            alt={product.name}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              objectFit: "contain",
+            }}
+          />
         </Box>
 
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h5">{product.name}</Typography>
-          <Typography sx={{ mt: 1 }}>SKU: {product.sku}</Typography>
+        {/* RIGHT */}
+        {images.length > 1 && (
+          <IconButton
+            onClick={next}
+            disabled={current === images.length - 1}
+            sx={{ position: "absolute", top: "50%", right: 10 }}
+          >
+            <ArrowForwardIos />
+          </IconButton>
+        )}
+      </Paper>
 
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            ₹ {product.price}
-          </Typography>
+      {/* INFO */}
+      <Typography variant="h6" sx={{ mt: 2 }}>
+        {product.name}
+      </Typography>
 
-          <Typography sx={{ mt: 3 }}>
-            {product.description || "No description"}
-          </Typography>
+      <Chip
+  label={formatCategory(product.category)}
+  size="small"
+  sx={{
+    mt: 1,
+    maxWidth: "100%",
+    whiteSpace: "normal",      // ✅ wrap allow
+    height: "auto",
+    "& .MuiChip-label": {
+      display: "block",
+      whiteSpace: "normal",
+      lineHeight: 1.2,
+      px: 1,
+      py: 0.5,
+      textAlign: "center",
+    },
+  }}
+/>
 
-          <Box sx={{ mt: 4 }}>
-            <Button variant="contained" onClick={handleAdd}>
-              Add to Cart
-            </Button>
-          </Box>
-        </Box>
-      </Box>
+      {product.subCategory && (
+        <Typography variant="body2" color="text.secondary">
+          {product.subCategory}
+        </Typography>
+      )}
+
+      <Typography variant="h6" sx={{ mt: 1 }}>
+        ₹ {product.price}
+      </Typography>
+
+      <Button variant="contained" sx={{ mt: 2 }}>
+        Add to Cart
+      </Button>
     </Container>
   );
 }

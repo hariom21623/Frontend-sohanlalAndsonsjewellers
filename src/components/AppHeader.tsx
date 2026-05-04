@@ -34,14 +34,15 @@ export default function AppHeader() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ backgroundColor: "#800000" }}>
       <Toolbar>
         <Typography
           variant="h6"
-          sx={{ flexGrow: 1, cursor: "pointer" }}
+          sx={{ flexGrow: 1, cursor: "pointer",color: "#d4af37", fontWeight: "bold" }}
           onClick={() => navigate("/")}
         >
-          Sohan Lal & Son’s Jewellers
+          {/* Sohan Lal & Son’s Jewellers */}
+          सोहन लाल एंड संस ज्वैलर्स
         </Typography>
 
         {/* ================= MOBILE ================= */}
