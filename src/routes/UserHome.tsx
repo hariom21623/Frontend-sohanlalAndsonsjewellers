@@ -11,6 +11,7 @@ import CartDrawer from "../components/Users/Cart/CartDrawer";
 
 export default function UserHome() {
   const [products, setProducts] = useState<any[]>([]);
+  const [initialProducts, setInitialProducts] = useState<any[]>([]); // 🔥 Unique categories extraction ke liye backup string array
   const [loading, setLoading] = useState(false);
 
   const [filters, setFilters] = useState({
@@ -21,25 +22,38 @@ export default function UserHome() {
   const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
+    const { signal } = controller;
 
     async function fetchProducts() {
       setLoading(true);
       try {
-        const res = await getAllPublic(filters);
-        if (active) setProducts(res.products || []);
-      } catch (err) {
-        console.error(err);
-        if (active) setProducts([]);
+        const res = await getAllPublic({ ...filters, signal });
+        if (!signal.aborted) {
+          setProducts(res.products || []);
+          
+          // Agar pehli baar fetch ho rha hai (View All par), toh dynamic categories ke liye store kar lein
+          if (filters.category === "all" && filters.q === "") {
+            setInitialProducts(res.products || []);
+          }
+        }
+      } catch (err: any) {
+        if (err.name === "CanceledError" || err.message === "canceled") {
+          return; 
+        }
+        console.error("Fetch failure:", err);
+        setProducts([]);
       } finally {
-        if (active) setLoading(false);
+        if (!signal.aborted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchProducts();
 
     return () => {
-      active = false;
+      controller.abort();
     };
   }, [filters]);
 
@@ -48,27 +62,34 @@ export default function UserHome() {
   }, []);
 
   const handleCategory = useCallback((cat: string) => {
-    setFilters((prev) => (prev.category === cat ? prev : { ...prev, category: cat }));
+    setFilters((prev) => (prev.category === cat ? prev : { ...prev, category: cat, q: "" }));
   }, []);
 
   return (
-    <>
+    <Box sx={{ bgcolor: "#FDFBF7", minHeight: "100vh" }}>
       <MainNavbar onSearch={handleSearch} />
 
-      <CategoryStrip onSelect={handleCategory} />
+      {/* 🔥 Ab hum dynamic calculations ke liye products backup bhej rhe hain */}
+      <CategoryStrip products={initialProducts} onSelect={handleCategory} />
 
-      {/* 🔥 Banner */}
       <HomeBanner category={filters.category} />
 
-      {/* 🔥 Products displayed horizontally */}
-      <Container maxWidth="lg" sx={{ mt: 3 }}>
+      <Container maxWidth="lg" sx={{ mt: 6, mb: 8 }}>
         {loading ? (
-          <Box sx={{ textAlign: "center", mt: 6 }}>
-            <CircularProgress />
+          <Box sx={{ textAlign: "center", py: 6 }}>
+            <CircularProgress sx={{ color: "#4A0E17" }} />
           </Box>
         ) : products.length === 0 ? (
-          <Box sx={{ textAlign: "center", mt: 6 }}>
-            <Typography>No Products Available</Typography>
+          <Box sx={{ 
+            textAlign: "center", 
+            py: 8, 
+            border: "1px dashed #E5D5BC", 
+            bgcolor: "#F9F6F0",
+            px: 2
+          }}>
+            <Typography sx={{ fontFamily: '"Playfair Display", serif', color: "#6E6557", fontStyle: "italic", fontSize: "1.1rem" }}>
+              No exquisite pieces found matching this collection selection.
+            </Typography>
           </Box>
         ) : (
           <ProductGrid products={products} />
@@ -79,6 +100,6 @@ export default function UserHome() {
       <UserFooter />
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
-    </>
+    </Box>
   );
 }

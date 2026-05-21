@@ -1,162 +1,256 @@
-import React, { useEffect, useState } from "react";
-import {
-  Container,
-  Paper,
-  Typography,
-  Button,
-  Box,
-  IconButton,
-  Chip,
-} from "@mui/material";
-import {
-  ArrowBackIos,
-  ArrowForwardIos,
-  ArrowBack,
-} from "@mui/icons-material";
-import { useParams, useNavigate } from "react-router-dom";
-import { getByIdPublic } from "../api/product";
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Container, Grid, Box, Typography, Button, CircularProgress, Divider, IconButton } from '@mui/material';
+import { FavoriteBorder, ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
+import MainNavbar from '../components/Users/Navbar/MainNavbar';
+import UserFooter from '../components/Users/Footer/MainFooter';
+import { getByIdPublic } from '../api/product';
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [product, setProduct] = useState<any>(null);
-  const [images, setImages] = useState<string[]>([]);
-  const [current, setCurrent] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [activeImgIndex, setActiveImgIndex] = useState(0);
 
   useEffect(() => {
     if (!id) return;
-
-    (async () => {
-      const res = await getByIdPublic(id);
-      const data = res.product;
-
-      setProduct(data);
-
-      let imgs: string[] = [];
-
-      if (Array.isArray(data.images)) imgs = data.images;
-      else if (typeof data.images === "string") {
-        try {
-          imgs = JSON.parse(data.images);
-        } catch {
-          imgs = [data.images];
-        }
+    async function loadProduct() {
+      setLoading(true);
+      try {
+        const res = await getByIdPublic(id as string);
+        setProduct(res.product || res);
+      } catch (err) {
+        console.error("Error loading product profile:", err);
+      } finally {
+        setLoading(false);
       }
-
-      setImages(imgs);
-    })();
+    }
+    loadProduct();
   }, [id]);
 
-  const next = () => {
-    if (current < images.length - 1) setCurrent(current + 1);
+  if (loading) {
+    return (
+      <Box sx={{ bgcolor: '#FDFBF7', minHeight: '100vh' }}>
+        <MainNavbar onSearch={() => { }} />
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+          <CircularProgress sx={{ color: '#4A0E17' }} />
+        </Box>
+      </Box>
+    );
+  }
+
+  if (!product) {
+    return (
+      <Box sx={{ bgcolor: '#FDFBF7', minHeight: '100vh' }}>
+        <MainNavbar onSearch={() => { }} />
+        <Container sx={{ textAlign: 'center', py: 10 }}>
+          <Typography variant="h5" sx={{ fontFamily: '"Playfair Display", serif', mb: 3 }}>
+            Exquisite Item Profile Not Found
+          </Typography>
+          <Button variant="outlined" onClick={() => navigate('/')} sx={{ borderColor: '#4A0E17', color: '#4A0E17' }}>
+            Back To Showroom
+          </Button>
+        </Container>
+      </Box>
+    );
+  }
+
+  const imageList = Array.isArray(product.images) ? product.images : [];
+  const currentImage = imageList[activeImgIndex] || 'https://via.placeholder.com/500x600?text=Premium+Jewellery';
+
+  const handlePrevImage = () => {
+    setActiveImgIndex((prev) => (prev === 0 ? imageList.length - 1 : prev - 1));
   };
 
-  const prev = () => {
-    if (current > 0) setCurrent(current - 1);
+  const handleNextImage = () => {
+    setActiveImgIndex((prev) => (prev === imageList.length - 1 ? 0 : prev + 1));
   };
 
-  const formatCategory = (cat: string) => {
-    if (cat === "1Gram Gold Polished Jewellery") return "1 Gram Gold";
-    return cat;
-  };
-
-  if (!product) return <div>Loading...</div>;
+  const hasValidWeight = product.weight && String(product.weight).toLowerCase() !== 'n/a' && Number(product.weight) !== 0;
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      
-      {/* 🔥 BACK BUTTON */}
-      <Button
-        startIcon={<ArrowBack />}
-        onClick={() => navigate(-1)}
-        sx={{ mb: 2 }}
-      >
-        Back
-      </Button>
+    <Box sx={{ bgcolor: '#FDFBF7', minHeight: '100vh' }}>
+      <MainNavbar onSearch={() => { }} />
 
-      <Paper sx={{ p: 2, textAlign: "center", position: "relative" }}>
+      {/* Container spacing adjusts fluidly on mobile (xs) vs desktop (md) */}
+      <Container maxWidth="lg" sx={{ py: { xs: 2, md: 6 }, px: { xs: 2, sm: 3, md: 4 } }}>
 
-        {/* LEFT */}
-        {images.length > 1 && (
-          <IconButton
-            onClick={prev}
-            disabled={current === 0}
-            sx={{ position: "absolute", top: "50%", left: 10 }}
-          >
-            <ArrowBackIos />
-          </IconButton>
-        )}
-
-        {/* IMAGE */}
-        <Box
-          sx={{
-            height: 350,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+        <Button
+          startIcon={<ArrowBackIos sx={{ fontSize: '0.8rem !important' }} />}
+          onClick={() => navigate(-1)}
+          sx={{ color: '#6E6557', mb: { xs: 2, md: 4 }, letterSpacing: '0.1em', '&:hover': { bgcolor: 'transparent', color: '#4A0E17' } }}
         >
-          <img
-            src={images[current] || "/placeholder.png"}
-            alt={product.name}
-            style={{
-              maxWidth: "100%",
-              maxHeight: "100%",
-              objectFit: "contain",
-            }}
-          />
-        </Box>
+          Back to Collection
+        </Button>
 
-        {/* RIGHT */}
-        {images.length > 1 && (
-          <IconButton
-            onClick={next}
-            disabled={current === images.length - 1}
-            sx={{ position: "absolute", top: "50%", right: 10 }}
-          >
-            <ArrowForwardIos />
-          </IconButton>
-        )}
-      </Paper>
+        {/* Responsive Grid layout system splits cleanly across breakpoints */}
+        <Grid container spacing={{ xs: 4, md: 6, lg: 8 }} sx={{ alignItems: 'center' }}>
 
-      {/* INFO */}
-      <Typography variant="h6" sx={{ mt: 2 }}>
-        {product.name}
-      </Typography>
+          {/* Left Column: Image Media Spotlight Frame */}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Box sx={{
+              position: 'relative',
+              width: '100%',
+              // 🔥 FIXED: Added responsive maximum height boundary safeguards to prevent blowing up on large desktop setups
+              maxHeight: { xs: '70vh', sm: '500px', md: '550px' },
+              aspectRatio: '1 / 1.15', // Perfectly balanced classical jewelry showcase portrait ratio
+              bgcolor: '#FFFFFF',
+              border: '1px solid #E5D5BC',
+              overflow: 'hidden',
+              mx: 'auto'
+            }}>
+              <img
+                src={currentImage}
+                alt={product.name}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block'
+                }}
+              />
 
-      <Chip
-  label={formatCategory(product.category)}
-  size="small"
-  sx={{
-    mt: 1,
-    maxWidth: "100%",
-    whiteSpace: "normal",      // ✅ wrap allow
-    height: "auto",
-    "& .MuiChip-label": {
-      display: "block",
-      whiteSpace: "normal",
-      lineHeight: 1.2,
-      px: 1,
-      py: 0.5,
-      textAlign: "center",
-    },
-  }}
-/>
+              {/* Responsive Minimalist Navigation Arrows */}
+              {imageList.length > 1 && (
+                <>
+                  <IconButton
+                    onClick={handlePrevImage}
+                    sx={{
+                      position: 'absolute', top: '50%', left: 16, transform: 'translateY(-50%)',
+                      bgcolor: 'rgba(253, 251, 247, 0.8)', color: '#4A0E17', borderRadius: 0,
+                      p: { xs: 1, md: 1.5 },
+                      '&:hover': { bgcolor: '#FDFBF7' }
+                    }}
+                  >
+                    <ArrowBackIos sx={{ fontSize: { xs: '0.8rem', md: '1rem' }, pl: '6px' }} />
+                  </IconButton>
 
-      {product.subCategory && (
-        <Typography variant="body2" color="text.secondary">
-          {product.subCategory}
-        </Typography>
-      )}
+                  <IconButton
+                    onClick={handleNextImage}
+                    sx={{
+                      position: 'absolute', top: '50%', right: 16, transform: 'translateY(-50%)',
+                      bgcolor: 'rgba(253, 251, 247, 0.8)', color: '#4A0E17', borderRadius: 0,
+                      p: { xs: 1, md: 1.5 },
+                      '&:hover': { bgcolor: '#FDFBF7' }
+                    }}
+                  >
+                    <ArrowForwardIos sx={{ fontSize: { xs: '0.8rem', md: '1rem' } }} />
+                  </IconButton>
+                </>
+              )}
+            </Box>
+          </Grid>
 
-      <Typography variant="h6" sx={{ mt: 1 }}>
-        ₹ {product.price}
-      </Typography>
+          {/* Right Column: Premium Copy Specifications Text Panel */}
+          <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Box sx={{ pl: { md: 2, lg: 4 } }}> {/* Adds premium whitespace gutter spacing separation on desktop views only */}
 
-      <Button variant="contained" sx={{ mt: 2 }}>
-        Add to Cart
-      </Button>
-    </Container>
+              <Typography variant="caption" sx={{ textTransform: 'uppercase', letterSpacing: '0.15em', color: '#6E6557', fontWeight: 500, fontSize: '0.75rem' }}>
+                {product.category} • Certified Collection
+              </Typography>
+
+              <Typography variant="h3" sx={{
+                fontFamily: '"Playfair Display", serif',
+                fontWeight: 600,
+                color: '#4A0E17',
+                mt: 1,
+                mb: 1,
+                fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' },
+                lineHeight: 1.2
+              }}>
+                {product.name}
+              </Typography>
+
+              {product.sku && (
+                <Typography variant="caption" sx={{ color: '#A0A0A0', letterSpacing: '0.05em', display: 'block', mb: 2 }}>
+                  SKU: {product.sku}
+                </Typography>
+              )}
+
+              <Typography variant="h4" sx={{ fontWeight: 500, color: '#1A1A1A', mb: 3, fontSize: { xs: '1.5rem', md: '1.8rem' } }}>
+                ₹{Number(product.price).toLocaleString('en-IN')}
+              </Typography>
+
+              <Divider sx={{ borderColor: '#E5D5BC', mb: 3 }} />
+
+              <Box sx={{ display: 'flex', gap: 4, mb: 4 }}>
+                {hasValidWeight && (
+                  <Box>
+                    <Typography variant="caption" sx={{ color: '#6E6557', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Approx Weight
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: '#4A0E17' }}>
+                      {product.weight} Grams
+                    </Typography>
+                  </Box>
+                )}
+                {/* Right Column Specifications Section */}
+                <Box sx={{ display: 'flex', gap: 4, mb: 4 }}>
+                  {hasValidWeight && (
+                    <Box>
+                      <Typography variant="caption" sx={{ color: '#6E6557', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Approx Weight
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#4A0E17' }}>
+                        {product.weight} Grams
+                      </Typography>
+                    </Box>
+                  )}
+
+                  <Box>
+                    <Typography variant="caption" sx={{ color: '#6E6557', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Metal Polish Base
+                    </Typography>
+
+                    {/* 🔥 DYNAMIC RULE: Checks product category safely */}
+                    <Typography variant="body1" sx={{ fontWeight: 600, color: '#4A0E17' }}>
+                      {product.category === "Gold"
+                        ? "Pure Gold Base"
+                        : product.category === "Silver"
+                          ? "Fine Sterling Silver"
+                          : "Premium 1-Gram Gold Polish"
+                      }
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+
+              {product.description && (
+                <Typography variant="body2" sx={{ color: '#444444', lineHeight: 1.7, mb: 4, letterSpacing: '0.02em', fontSize: '0.9rem' }}>
+                  {product.description}
+                </Typography>
+              )}
+
+              {/* Action Buttons with Dynamic Responsive View Adjustments */}
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    bgcolor: '#4A0E17',
+                    color: '#FDFBF7',
+                    py: { xs: 1.5, md: 2 },
+                    letterSpacing: '0.15em',
+                    fontWeight: 600,
+                    borderRadius: 0,
+                    fontSize: { xs: '0.8rem', md: '0.9rem' },
+                    '&:hover': { bgcolor: '#2C050B' }
+                  }}
+                >
+                  ADD TO SHOPPING BAG
+                </Button>
+                <IconButton sx={{ border: '1px solid #E5D5BC', px: 2, color: '#4A0E17', borderRadius: 0 }}>
+                  <FavoriteBorder />
+                </IconButton>
+              </Box>
+
+            </Box>
+          </Grid>
+        </Grid>
+      </Container>
+
+      <UserFooter />
+    </Box>
   );
 }

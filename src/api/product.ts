@@ -2,12 +2,15 @@ import axiosInstance from "./axios";
 
 // ================= PUBLIC =================
 
-export const getAllPublic = async (filters: { q: string; category: string }) => {
+// Added optional signal into the filters type definition block
+export const getAllPublic = async (filters: { q: string; category: string; signal?: AbortSignal }) => {
   const res = await axiosInstance.get("/product/public/getAllProduct", {
     params: {
       q: filters.q,
       category: filters.category,
     },
+    // 🔥 Passes the network abort switch straight into your Axios lifecycle instance config
+    signal: filters.signal, 
   });
 
   return {
