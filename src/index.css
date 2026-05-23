@@ -1,8 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
 html, body, #root {
   height: 100%;
   margin: 0;
+  background-color: #0A0A0A !important;
 }
 
 body {
-  background: #f5f7fb;
+  background-color: #0A0A0A !important; 
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Luxury Global Typography Fallbacks */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
 }
