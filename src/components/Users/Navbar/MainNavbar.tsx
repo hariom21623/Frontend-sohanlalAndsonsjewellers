@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Box, InputBase, IconButton, Badge, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { ShoppingBagOutlined, FavoriteBorderOutlined, PersonOutlineOutlined, SearchOutlined, LogoutOutlined } from '@mui/icons-material';
 import { useAuth } from '../../../contexts/AuthProvider'; 
+import TrustBar from './TrustBar'; // 🔥 Integrated standalone TrustBar component here
 
 interface MainNavbarProps {
   onSearch: (query: string) => void;
@@ -21,68 +22,84 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
   };
 
   return (
-    <AppBar position="sticky" elevation={0} sx={{ borderBottom: '1px solid #E5D5BC', bgcolor: '#FDFBF7', zIndex: 1100 }}>
-      {/* Top Banner Accent */}
+    <AppBar 
+      position="sticky" 
+      elevation={0} 
+      sx={{ 
+        borderBottom: '1px solid rgba(229, 213, 188, 0.15)', 
+        bgcolor: '#0A0A0A', 
+        zIndex: 1100 
+      }}
+    >
+      {/* 🚀 Mounts single dedicated luxury trust alert panel safely */}
+      <TrustBar />
 
       {/* Main Container Toolbar */}
       <Toolbar sx={{ 
         flexDirection: 'column',
         alignItems: 'stretch',
         px: { xs: 2, md: 6 }, 
-        py: { xs: 1.5, md: 1 } 
+        py: { xs: 1.9, md: 1.5 } 
       }}>
         
         {/* Row 1: Brand Logo & Actions Area */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: { xs: 1.5, md: 0 } }}>
           
-          {/* Scalable Luxury Typography */}
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              fontFamily: '"Playfair Display", serif', 
-              fontWeight: 700, 
-              color: '#4A0E17',
-              letterSpacing: '0.02em',
-              fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.7rem' },
-              whiteSpace: 'nowrap'
-            }}
-          >
-            सोहन लाल एंड संस ज्वेलर्स
-          </Typography>
+          {/* Brand Identity Label Frame */}
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontFamily: '"Playfair Display", serif', 
+                fontWeight: 700, 
+                color: '#E5D5BC', 
+                letterSpacing: '0.05em',
+                fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.6rem' },
+                whiteSpace: 'nowrap',
+                lineHeight: 1
+              }}
+            >
+              सोहन लाल एंड संस ज्वेलर्स
+            </Typography>
+            <Typography variant="caption" sx={{ letterSpacing: '0.32em', fontSize: '0.52rem', color: '#FFFFFF', display: 'block', mt: 0.5 }}>
+              LUXE JEWELLERY SHOWROOM
+            </Typography>
+          </Box>
 
-          {/* Action Row Controls (Reordered to put Profile/Person at the very last position 🔥) */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 } }}>
-            {/* 1. Wishlist Icon */}
-            <IconButton sx={{ color: '#4A0E17', p: { xs: 0.5, sm: 1 } }}>
-              <Badge badgeContent={0} color="primary"><FavoriteBorderOutlined /></Badge>
+          {/* Action Triggers Grid System Controls */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1.5 } }}>
+            <IconButton sx={{ color: '#FFFFFF', p: { xs: 0.5, sm: 1 }, '&:hover': { color: '#E5D5BC' } }}>
+              <Badge badgeContent={0} sx={{ '& .MuiBadge-badge': { bgcolor: '#E5D5BC', color: '#0A0A0A', fontWeight: 700 } }}>
+                <FavoriteBorderOutlined />
+              </Badge>
             </IconButton>
             
-            {/* 2. Shopping Bag Icon */}
-            <IconButton sx={{ color: '#4A0E17', p: { xs: 0.5, sm: 1 } }}>
-              <Badge badgeContent={0} color="primary"><ShoppingBagOutlined /></Badge>
+            <IconButton sx={{ color: '#FFFFFF', p: { xs: 0.5, sm: 1 }, '&:hover': { color: '#E5D5BC' } }}>
+              <Badge badgeContent={0} sx={{ '& .MuiBadge-badge': { bgcolor: '#E5D5BC', color: '#0A0A0A', fontWeight: 700 } }}>
+                <ShoppingBagOutlined />
+              </Badge>
             </IconButton>
 
-            {/* 3. Profile Person Action (Moved to last position) */}
             <IconButton 
               onClick={(e) => setAnchorEl(e.currentTarget)}
-              sx={{ color: '#4A0E17', p: { xs: 0.5, sm: 1 }, ml: 0.5 }}
+              sx={{ color: '#FFFFFF', p: { xs: 0.5, sm: 1 }, ml: 0.5, '&:hover': { color: '#E5D5BC' } }}
             >
               <PersonOutlineOutlined />
             </IconButton>
           </Box>
         </Box>
 
-        {/* Row 2: Search Input Bar */}
+        {/* Row 2: Deep Dark Minimal Embedded Search Bar Box */}
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center', 
-          bgcolor: '#F9F6F0', 
+          bgcolor: '#141414', 
           px: 2, 
-          py: 0.5, 
-          width: { xs: '100%', md: '35%' },
+          py: 0.4, 
+          width: { xs: '100%', md: '32%' },
           mx: 'auto',
-          border: '1px solid #E5D5BC', 
-          '&:focus-within': { borderColor: '#4A0E17' },
+          border: '1px solid rgba(229, 213, 188, 0.3)', 
+          '&:focus-within': { borderColor: '#E5D5BC' },
           position: { md: 'absolute' },
           left: { md: '50%' },
           transform: { md: 'translateX(-50%)' },
@@ -92,13 +109,13 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
             placeholder="Search collections..." 
             value={searchVal} 
             onChange={handleChange} 
-            sx={{ ml: 1, flex: 1, fontSize: '0.9rem' }} 
+            sx={{ ml: 1, flex: 1, fontSize: '0.85rem', color: '#FFFFFF', '& input::placeholder': { color: '#B3B3B3', opacity: 1 } }} 
           />
-          <SearchOutlined sx={{ color: '#4A0E17', fontSize: '1.2rem' }} />
+          <SearchOutlined sx={{ color: '#E5D5BC', fontSize: '1.2rem' }} />
         </Box>
       </Toolbar>
 
-      {/* Luxury Dropdown Profile Menu */}
+      {/* Profile Overlay Selection Drawer Matrix */}
       <Menu
         anchorEl={anchorEl}
         open={isMenuOpen}
@@ -106,19 +123,19 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
         PaperProps={{
           elevation: 0,
           sx: {
-            bgcolor: '#FDFBF7',
-            border: '1px solid #E5D5BC',
+            bgcolor: '#141414',
+            border: '1px solid rgba(229, 213, 188, 0.25)',
             borderRadius: 0, 
             mt: 1,
-            minWidth: 160,
+            minWidth: 180,
             '& .MuiMenuItem-root': {
-              fontSize: '0.85rem',
-              letterSpacing: '0.05em',
-              color: '#1A1A1A',
-              py: 1.2,
+              fontSize: '0.8rem',
+              letterSpacing: '0.08em',
+              color: '#FFFFFF',
+              py: 1.4,
               '&:hover': {
-                bgcolor: 'rgba(74, 14, 23, 0.04)',
-                color: '#4A0E17'
+                bgcolor: 'rgba(229, 213, 188, 0.08)',
+                color: '#E5D5BC'
               }
             }
           }
@@ -127,14 +144,14 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         {user && (
-          <Box sx={{ px: 2, py: 1, borderBottom: '1px solid #E5D5BC', mb: 0.5 }}>
-            <Typography variant="caption" sx={{ display: 'block', color: '#6E6557' }}>Logged in as</Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: '#4A0E17' }}>{user.name || 'Customer'}</Typography>
+          <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid rgba(229, 213, 188, 0.15)', mb: 0.5 }}>
+            <Typography variant="caption" sx={{ display: 'block', color: '#B3B3B3', fontSize: '0.7rem', letterSpacing: '0.05em' }}>LOGGED IN AS</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: '#E5D5BC', mt: 0.2 }}>{user.name || 'Customer'}</Typography>
           </Box>
         )}
         <MenuItem onClick={() => { setAnchorEl(null); logout("/login"); }}>
           <ListItemIcon>
-            <LogoutOutlined fontSize="small" sx={{ color: '#4A0E17' }} />
+            <LogoutOutlined fontSize="small" sx={{ color: '#E5D5BC' }} />
           </ListItemIcon>
           LOGOUT
         </MenuItem>

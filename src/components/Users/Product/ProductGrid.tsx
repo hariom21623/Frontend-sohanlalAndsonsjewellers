@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from '@mui/material';
+import { Grid } from '@mui/material'; // Safe cross-version verification import
 import ProductCard from './ProductCard';
 
 interface ProductGridProps {
@@ -8,10 +8,10 @@ interface ProductGridProps {
 
 export default function ProductGrid({ products }: ProductGridProps) {
   return (
+    // Uses structural uniform layout gutters for crisp margins alignment matrix
     <Grid container spacing={{ xs: 2, md: 4 }}>
       {products.map((product) => (
-        // Changed "item xs={6} sm={4} md={3}" to modern "size={{ xs: 6, sm: 4, md: 3 }}"
-        <Grid size={{ xs: 6, sm: 4, md: 3 }} key={product._id}>
+        <Grid size={{ xs: 6, sm: 4, md: 3 }} key={product.id || product._id}>
           <ProductCard product={product} />
         </Grid>
       ))}

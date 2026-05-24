@@ -3,12 +3,12 @@
 html, body, #root {
   height: 100%;
   margin: 0;
+  background-color: #0A0A0A !important;
 }
 
 body {
-  /* 🔥 Updated to luxury light silk cream */
-  background-color: #FDFBF7 !important; 
-  color: #1A1A1A;
+  background-color: #0A0A0A !important; 
+  color: #FFFFFF;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
 }

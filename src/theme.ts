@@ -2,35 +2,34 @@ import { createTheme } from '@mui/material/styles';
 
 export const luxuryTheme = createTheme({
   palette: {
+    mode: 'dark', // 🚀 Forces dark mode baseline settings
+    background: {
+      default: '#0A0A0A', // Mockup matte black canvas
+      paper: '#141414',   // Deep charcoal floating blocks/dropdowns
+    },
     primary: {
-      main: '#4A0E17', // Deep, elegant Burgundy/Maroon instead of bright red
-      light: '#722F37',
-      dark: '#2C050B',
-      contrastText: '#FFFFFF',
+      main: '#E5D5BC',    // Premium soft luxury gold accent
+      light: '#F5E6D3',
+      dark: '#B89B73',
+      contrastText: '#0A0A0A',
     },
     secondary: {
-      main: '#D4AF37', // Warm Champagne Gold accents
-      light: '#F3E5AB',
-      dark: '#AA7C11',
-      contrastText: '#1A1A1A',
-    },
-    background: {
-      default: '#FAFAFA', // Soft off-white to eliminate sterile bright white walls
-      paper: '#FFFFFF',
+      main: '#FFFFFF',
+      contrastText: '#0A0A0A',
     },
     text: {
-      primary: '#1A1A1A', // Softer black for editorial reading comfort
-      secondary: '#757575',
+      primary: '#FFFFFF',
+      secondary: '#B3B3B3',
     },
   },
   typography: {
     fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
-    h1: { fontFamily: '"Playfair Display", "Georgia", serif', fontWeight: 600 },
-    h2: { fontFamily: '"Playfair Display", "Georgia", serif', fontWeight: 500 },
-    h3: { fontFamily: '"Playfair Display", "Georgia", serif', fontWeight: 500 },
-    h4: { fontFamily: '"Playfair Display", "Georgia", serif', fontWeight: 500 },
-    h5: { fontFamily: '"Playfair Display", "Georgia", serif', fontWeight: 500 },
-    h6: { fontFamily: '"Playfair Display", "Georgia", serif', fontWeight: 600, letterSpacing: '0.05em' },
+    h1: { fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '0.03em' },
+    h2: { fontFamily: '"Playfair Display", serif', fontWeight: 500, letterSpacing: '0.03em' },
+    h3: { fontFamily: '"Playfair Display", serif', fontWeight: 500 },
+    h4: { fontFamily: '"Playfair Display", serif', fontWeight: 500 },
+    h5: { fontFamily: '"Playfair Display", serif', fontWeight: 600 },
+    h6: { fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '0.05em' },
     button: {
       textTransform: 'uppercase',
       letterSpacing: '0.15em',
@@ -41,23 +40,24 @@ export const luxuryTheme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 0, // Sharp crisp edges shout luxury tailoring more than rounded pills
-          padding: '10px 24px',
+          borderRadius: 0, // Tailored sharp modern edges
+          padding: '12px 28px',
           transition: 'all 0.3s ease-in-out',
         },
         containedPrimary: {
-          backgroundColor: '#4A0E17',
+          backgroundColor: '#E5D5BC',
+          color: '#0A0A0A',
           '&:hover': {
-            backgroundColor: '#2C050B',
-            boxShadow: '0px 4px 20px rgba(74, 14, 23, 0.15)',
+            backgroundColor: '#B89B73',
+            boxShadow: '0px 4px 20px rgba(229, 213, 188, 0.2)',
           },
         },
-        outlinedSecondary: {
-          borderColor: '#D4AF37',
-          color: '#AA7C11',
+        outlinedPrimary: {
+          borderColor: '#E5D5BC',
+          color: '#E5D5BC',
           '&:hover': {
-            borderColor: '#AA7C11',
-            backgroundColor: 'rgba(212, 175, 55, 0.04)',
+            borderColor: '#FFFFFF',
+            backgroundColor: 'rgba(229, 213, 188, 0.05)',
           },
         },
       },
@@ -67,9 +67,12 @@ export const luxuryTheme = createTheme({
         root: {
           borderRadius: 0,
           boxShadow: 'none',
-          border: '1px solid #EFEFEF',
+          border: '1px solid rgba(229, 213, 188, 0.15)',
+          backgroundColor: '#141414',
+          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
           '&:hover': {
-            boxShadow: '0px 12px 30px rgba(0, 0, 0, 0.04)',
+            transform: 'translateY(-4px)',
+            boxShadow: '0px 12px 30px rgba(229, 213, 188, 0.05)',
           },
         },
       },
