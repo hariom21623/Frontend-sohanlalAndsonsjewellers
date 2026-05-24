@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import ScrollToTop from "./components/Users/Banner/ScrollToTop";
 
 // Auth
 import { useAuth } from "./contexts/AuthProvider";
@@ -11,6 +12,7 @@ import UserHome from "./routes/UserHome";
 
 // User
 import ProductDetails from "./routes/ProductDetails";
+import CollectionLanding from "./routes/CollectionLanding"; // 🚀 IMPORTED NEW LANDING PAGE
 
 // Admin Pages
 import UserList from "./routes/Admin/UserList";
@@ -36,17 +38,18 @@ export default function App() {
       <Routes>
         {/* ================= PUBLIC ================= */}
         <Route path="/login" element={<LoginPage />} />
-
         <Route path="/register" element={<RegisterPage />} />
 
         {/* ================= USER ================= */}
         <Route path="/" element={<UserHome />} />
         <Route path="/user" element={<UserHome />} />
+        
+        {/* 🚀 NEW: Dedicated intermediate luxury variations breakdown landing node */}
+        <Route path="/collection/:name" element={<CollectionLanding />} />
+        
         <Route path="/product/:id" element={<ProductDetails />} />
 
         {/* ================= ADMIN ================= */}
-        {/* (keeping unprotected as you said) */}
-
         {/* USERS */}
         <Route path="/admin/users" element={<UserList />} />
         <Route path="/admin/users/create" element={<UserCreate />} />

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Box, InputBase, IconButton, Badge, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { ShoppingBagOutlined, FavoriteBorderOutlined, PersonOutlineOutlined, SearchOutlined, LogoutOutlined } from '@mui/icons-material';
+import { useNavigate, useLocation } from 'react-router-dom'; // 🚀 IMPORTED useLocation to check current path
 import { useAuth } from '../../../contexts/AuthProvider'; 
-import TrustBar from './TrustBar'; // 🔥 Integrated standalone TrustBar component here
+import TrustBar from './TrustBar'; 
 
 interface MainNavbarProps {
   onSearch: (query: string) => void;
@@ -10,6 +11,8 @@ interface MainNavbarProps {
 
 export default function MainNavbar({ onSearch }: MainNavbarProps) {
   const { logout, user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation(); // 🚀 Hook to trace active viewport address
   const [searchVal, setSearchVal] = useState("");
   
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -19,6 +22,22 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
     const value = e.target.value;
     setSearchVal(value);
     onSearch(value); 
+  };
+
+  // 🚀 🔥 INTELLIGENT LOGO CLICK FORCE SCROLL ENGINE
+  const handleLogoClick = () => {
+    // Check if user is already sitting on the base home coordinates paths
+    if (location.pathname === "/" || location.pathname === "/user") {
+      // Force instant coordinate resetting to absolute zero top position
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "smooth" // Smooth layout glide animation effect back to top banner
+      });
+    } else {
+      // If on any other secondary details screen, navigate home normally
+      navigate('/');
+    }
   };
 
   return (
@@ -31,10 +50,8 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
         zIndex: 1100 
       }}
     >
-      {/* 🚀 Mounts single dedicated luxury trust alert panel safely */}
       <TrustBar />
 
-      {/* Main Container Toolbar */}
       <Toolbar sx={{ 
         flexDirection: 'column',
         alignItems: 'stretch',
@@ -45,8 +62,20 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
         {/* Row 1: Brand Logo & Actions Area */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: { xs: 1.5, md: 0 } }}>
           
-          {/* Brand Identity Label Frame */}
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          {/* 🔥 FIXED BRAND IDENTITY BOX: Hooked to our advanced handleLogoClick engine */}
+          <Box 
+            onClick={handleLogoClick} // 🚀 Calls the dual navigation/force-scroll helper
+            sx={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              cursor: 'pointer', 
+              userSelect: 'none',
+              transition: 'opacity 0.3s ease',
+              '&:hover': {
+                opacity: 0.85 
+              }
+            }}
+          >
             <Typography 
               variant="h5" 
               sx={{ 
@@ -66,7 +95,7 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
             </Typography>
           </Box>
 
-          {/* Action Triggers Grid System Controls */}
+          {/* Action Triggers Controls */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1.5 } }}>
             <IconButton sx={{ color: '#FFFFFF', p: { xs: 0.5, sm: 1 }, '&:hover': { color: '#E5D5BC' } }}>
               <Badge badgeContent={0} sx={{ '& .MuiBadge-badge': { bgcolor: '#E5D5BC', color: '#0A0A0A', fontWeight: 700 } }}>
@@ -89,7 +118,7 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
           </Box>
         </Box>
 
-        {/* Row 2: Deep Dark Minimal Embedded Search Bar Box */}
+        {/* Row 2: Deep Dark Embedded Search Bar Box */}
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center', 
@@ -115,7 +144,7 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
         </Box>
       </Toolbar>
 
-      {/* Profile Overlay Selection Drawer Matrix */}
+      {/* Profile Menu Overlay */}
       <Menu
         anchorEl={anchorEl}
         open={isMenuOpen}
