@@ -4,8 +4,11 @@ export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
-  phoneNumber?: string;
-  adminRole?: boolean; // backend default: false
+  phoneNumber: string; // Made strictly matching database type constraints
+  address?: string;    // 🚀 INJECTED ALL EXTENDED PROPERTIES SAFELY
+  pincode?: string;
+  alternatePhone?: string;
+  adminRole?: boolean; 
 }
 
 export interface LoginPayload {
