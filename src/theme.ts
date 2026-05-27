@@ -2,63 +2,38 @@ import { createTheme } from '@mui/material/styles';
 
 export const luxuryTheme = createTheme({
   palette: {
-    mode: 'dark', // 🚀 Forces dark mode baseline settings
+    mode: 'light', // ✅ Changed to light
     background: {
-      default: '#0A0A0A', // Mockup matte black canvas
-      paper: '#141414',   // Deep charcoal floating blocks/dropdowns
+      default: '#FDFBF7', // ✅ Creamy white canvas
+      paper: '#FFFFFF',   // ✅ White paper blocks
     },
     primary: {
-      main: '#E5D5BC',    // Premium soft luxury gold accent
-      light: '#F5E6D3',
-      dark: '#B89B73',
-      contrastText: '#0A0A0A',
+      main: '#4A0E17',    // ✅ Deep Maroon (Brand Color)
+      contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#FFFFFF',
-      contrastText: '#0A0A0A',
+      main: '#B89B73',    // ✅ Luxury Gold accent
+      contrastText: '#FFFFFF',
     },
     text: {
-      primary: '#FFFFFF',
-      secondary: '#B3B3B3',
+      primary: '#1A1A1A', // ✅ Dark grey for readability
+      secondary: '#555555',
     },
   },
   typography: {
     fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
-    h1: { fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '0.03em' },
-    h2: { fontFamily: '"Playfair Display", serif', fontWeight: 500, letterSpacing: '0.03em' },
-    h3: { fontFamily: '"Playfair Display", serif', fontWeight: 500 },
-    h4: { fontFamily: '"Playfair Display", serif', fontWeight: 500 },
-    h5: { fontFamily: '"Playfair Display", serif', fontWeight: 600 },
-    h6: { fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '0.05em' },
-    button: {
-      textTransform: 'uppercase',
-      letterSpacing: '0.15em',
-      fontWeight: 500,
-    },
+    // Baaki typography settings wahi rakho...
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 0, // Tailored sharp modern edges
+          borderRadius: 0, 
           padding: '12px 28px',
-          transition: 'all 0.3s ease-in-out',
         },
         containedPrimary: {
-          backgroundColor: '#E5D5BC',
-          color: '#0A0A0A',
-          '&:hover': {
-            backgroundColor: '#B89B73',
-            boxShadow: '0px 4px 20px rgba(229, 213, 188, 0.2)',
-          },
-        },
-        outlinedPrimary: {
-          borderColor: '#E5D5BC',
-          color: '#E5D5BC',
-          '&:hover': {
-            borderColor: '#FFFFFF',
-            backgroundColor: 'rgba(229, 213, 188, 0.05)',
-          },
+          backgroundColor: '#4A0E17',
+          '&:hover': { backgroundColor: '#2C050B' },
         },
       },
     },
@@ -66,14 +41,8 @@ export const luxuryTheme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 0,
-          boxShadow: 'none',
-          border: '1px solid rgba(229, 213, 188, 0.15)',
-          backgroundColor: '#141414',
-          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-          '&:hover': {
-            transform: 'translateY(-4px)',
-            boxShadow: '0px 12px 30px rgba(229, 213, 188, 0.05)',
-          },
+          border: '1px solid rgba(74, 14, 23, 0.1)', // Subtle border
+          backgroundColor: '#FFFFFF',
         },
       },
     },

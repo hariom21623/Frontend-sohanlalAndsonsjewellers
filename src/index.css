@@ -3,17 +3,11 @@
 html, body, #root {
   height: 100%;
   margin: 0;
-  background-color: #0A0A0A !important;
+  background-color: #FDFBF7 !important; /* ✅ Updated to Cream */
 }
 
 body {
-  background-color: #0A0A0A !important; 
-  color: #FFFFFF;
+  background-color: #FDFBF7 !important; 
+  color: #1A1A1A; /* ✅ Dark text for readability */
   font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* Luxury Global Typography Fallbacks */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
 }

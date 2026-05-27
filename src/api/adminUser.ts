@@ -6,6 +6,12 @@ export const createUser = async (data: any) => {
   return res.data;
 };
 
+//getUser Profile
+export const getMyProfile = async () => {
+  const res = await axiosInstance.get("/user/profile"); // Backend ka naya route
+  return res.data;
+};
+
 // GET ALL USERS
 export const getAllUsers = async () => {
   const res = await axiosInstance.get("/user/getUsers");

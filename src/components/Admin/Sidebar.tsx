@@ -9,6 +9,7 @@ export default function Sidebar() {
     { label: "Users", path: "/admin/users" },
     { label: "Products", path: "/admin/products" },
     { label: "Bills", path: "/admin/bills" },
+    { label: "Orders", path: "/admin/orders" }, // <--- Ye add kiya
   ];
 
   return (

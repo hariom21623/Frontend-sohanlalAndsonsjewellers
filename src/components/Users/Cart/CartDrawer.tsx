@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Drawer, Box, IconButton, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, Button, Divider, Snackbar, Alert } from "@mui/material";
-import { CloseOutlined, DeleteOutline, AddOutlined, RemoveOutlined } from "@mui/icons-material"; 
+import { CloseOutlined, DeleteOutline, AddOutlined, RemoveOutlined } from "@mui/icons-material";
 import { useCart } from "../../../contexts/CartProvider";
 import { useNavigate } from "react-router-dom";
+import { placeOrder } from "../../../api/orderService";
 
 interface CartDrawerProps {
   open: boolean;
@@ -14,10 +15,11 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   const navigate = useNavigate();
   const [stockAlert, setStockAlert] = useState({ open: false, max: 0 });
 
+  // CartDrawer.tsx (Snippet)
   const proceed = () => {
     if (!items.length) return;
-    onClose();
-    navigate("/checkout");
+    onClose(); // Drawer band karo
+    navigate("/checkout"); // Bas Checkout page par bhejo
   };
 
   const handleQtyIncrease = (productId: string, currentQty: number) => {
@@ -31,7 +33,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     <>
       <Drawer anchor="right" open={open} onClose={onClose} PaperProps={{ sx: { bgcolor: '#FDFBF7', width: { xs: '100%', sm: 420 }, borderRadius: 0 } }}>
         <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-          
+
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2.5, bgcolor: '#0A0A0A' }}>
             <Typography variant="h6" sx={{ fontFamily: '"Playfair Display", serif', color: '#E5D5BC', fontWeight: 600 }}>Your Cart</Typography>
             <IconButton onClick={onClose} sx={{ color: '#E5D5BC' }}><CloseOutlined /></IconButton>
@@ -57,11 +59,11 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                           <DeleteOutline fontSize="small" />
                         </IconButton>
                       } sx={{ px: 1, py: 2 }}>
-                        
+
                         <ListItemAvatar sx={{ mr: 1.5 }}>
                           <Avatar src={it.image} variant="square" sx={{ width: 64, height: 64, border: '1px solid rgba(229, 213, 188, 0.3)', bgcolor: '#FFF' }} />
                         </ListItemAvatar>
-                        
+
                         <ListItemText
                           primary={<Typography variant="body2" sx={{ fontFamily: '"Playfair Display", serif', fontWeight: 600, color: '#1A1A1A' }}>{it.name}</Typography>}
                           secondary={
@@ -69,7 +71,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                               <Typography variant="caption" sx={{ color: '#6E6557', display: 'block', fontWeight: 600, mb: 0.5 }}>
                                 ₹{it.price.toLocaleString('en-IN')}
                               </Typography>
-                              
+
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
                                 <IconButton size="small" onClick={() => updateQty(it.productId, it.qty - 1)} sx={{ border: '1px solid rgba(229, 213, 188, 0.6)', borderRadius: 0, p: 0.4, bgcolor: '#FAF8F5' }}>
                                   <RemoveOutlined fontSize="inherit" sx={{ color: '#4A0E17' }} />

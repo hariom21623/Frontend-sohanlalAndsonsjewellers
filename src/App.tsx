@@ -29,6 +29,8 @@ import BillList from "./routes/Admin/BillList";
 import BillCreate from "./routes/Admin/BillCreate";
 import BillEdit from "./routes/Admin/BillEdit";
 import BillView from "./routes/Admin/BillView";
+import OrderList from "./routes/Admin/OrderList";
+import CheckoutPage from "./components/Users/Cart/CheckoutPage";
 
 export default function App() {
   const { token, user } = useAuth();
@@ -127,6 +129,9 @@ export default function App() {
         <Route path="/admin/bills/create" element={<BillCreate />} />
         <Route path="/admin/bills/edit/:id" element={<BillEdit />} />
         <Route path="/admin/bills/view/:id" element={<BillView />} />
+
+        <Route path="/admin/orders" element={<OrderList />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
 
         {/* ================= ROOT ================= */}
         <Route
