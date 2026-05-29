@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AppBar, Toolbar, Typography, Box, InputBase, IconButton, Badge, Menu, MenuItem, ListItemIcon } from '@mui/material';
-import { ShoppingBagOutlined, FavoriteBorderOutlined, PersonOutlineOutlined, SearchOutlined, LogoutOutlined } from '@mui/icons-material';
+import { ShoppingBagOutlined, FavoriteBorderOutlined, PersonOutlineOutlined, SearchOutlined, LogoutOutlined, Notifications } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthProvider';
 import { useCart } from '../../../contexts/CartProvider';
@@ -143,22 +143,50 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
           </Box>
         </Toolbar>
 
-        <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={() => setAnchorEl(null)}>
+        <Menu
+          anchorEl={anchorEl}
+          open={isMenuOpen}
+          onClose={() => setAnchorEl(null)}
+          PaperProps={{
+            sx: {
+              minWidth: 200,
+              mt: 1.5,
+              '& .MuiMenuItem-root': { py: 1.5, fontSize: '0.9rem' }
+            }
+          }}
+        >
           {user ? (
             <>
-              <Box sx={{ px: 2, py: 1.5 }}>
-                <Typography variant="caption">LOGGED IN AS</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.name}</Typography>
+              {/* Profile Header */}
+              <Box sx={{ px: 2, py: 1, borderBottom: '1px solid #eee', mb: 1 }}>
+                <Typography sx={{ fontWeight: 600 }}>{user.name}</Typography>
+                <Typography variant="caption" color="text.secondary">{user.email}</Typography>
               </Box>
+
+              <MenuItem onClick={() => { setAnchorEl(null); navigate("/profile"); }}>
+                <ListItemIcon><PersonOutlineOutlined fontSize="small" /></ListItemIcon>
+                My Profile
+              </MenuItem>
+
+              <MenuItem onClick={() => { setAnchorEl(null); navigate("/my-orders"); }}>
+                <ListItemIcon><ShoppingBagOutlined fontSize="small" /></ListItemIcon>
+                Orders
+              </MenuItem>
+
+              <MenuItem onClick={() => { setAnchorEl(null); navigate("/notifications"); }}>
+                <ListItemIcon><Notifications fontSize="small" /></ListItemIcon>
+                Notifications
+              </MenuItem>
+
               <MenuItem onClick={() => { setAnchorEl(null); logout("/"); }}>
                 <ListItemIcon><LogoutOutlined fontSize="small" /></ListItemIcon>
-                LOGOUT
+                Logout
               </MenuItem>
             </>
           ) : (
             <MenuItem onClick={() => { setAnchorEl(null); navigate("/login"); }}>
               <ListItemIcon><PersonOutlineOutlined fontSize="small" /></ListItemIcon>
-              LOGIN
+              Login
             </MenuItem>
           )}
         </Menu>

@@ -33,6 +33,9 @@ import OrderList from "./routes/Admin/OrderList";
 import CheckoutPage from "./components/Users/Cart/CheckoutPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
+import MyOrders from "./routes/MyOrders";
+import MyProfile from "./routes/MyProfile";
+import Notifications from "./routes/Notifications";
 
 export default function App() {
   const { token, user } = useAuth();
@@ -101,7 +104,13 @@ export default function App() {
       <PWAInstallPrompt />
       {/* Global Scroll To Top Trigger */}
       <ScrollToTop />
-      <ToastContainer position="bottom-center" autoClose={3000} />
+      {/* <ToastContainer position="bottom-center" autoClose={3000} /> */}
+      <ToastContainer 
+        position="top-right" // Default
+        autoClose={3000}
+        // ✅ Right Middle ke liye custom styles yahan daalo:
+        style={{ top: '50%', transform: 'translateY(-50%)' }} 
+      />
 
       <Routes>
         {/* ================= PUBLIC ================= */}
@@ -133,6 +142,9 @@ export default function App() {
         <Route path="/admin/bills/view/:id" element={<BillView />} />
 
         <Route path="/admin/orders" element={<OrderList />} />
+        <Route path="/profile" element={<ProtectedRoute><MyProfile /></ProtectedRoute>} />
+        <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>
         } />
 

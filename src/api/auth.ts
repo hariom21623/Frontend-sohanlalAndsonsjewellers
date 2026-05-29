@@ -1,3 +1,4 @@
+import axiosInstance from './axios';
 import api from './axios';
 
 export interface RegisterPayload {
@@ -26,4 +27,10 @@ export async function register(payload: RegisterPayload) {
 export async function login(payload: LoginPayload) {
   const res = await api.post('/auth/login', payload);
   return res.data; // expected: { token: "..." } or just token
+}
+
+export async function getMyNotifications() {
+  // ✅ Tumhare Router path aur prefix ke hisaab se sahi path:
+  const res = await api.get('/order/notifications/my');
+  return res.data;
 }

@@ -19,10 +19,29 @@ export default function OrderList() {
     setOrders(res.orders || []);
   }
 
-  const handleStatusUpdate = async (id: string, status: string) => {
+  // ✅ UPDATED: Status update logic with cleaned WhatsApp URL
+  const handleStatusUpdate = async (order: any, status: string) => {
     if (window.confirm(`Are you sure you want to ${status} this order?`)) {
-      await updateOrderStatus(id, status);
-      fetchOrders();
+      try {
+        await updateOrderStatus(order.id, status);
+        
+        // Agar status ACCEPTED hai, toh WhatsApp trigger karo
+        if (status === "ACCEPTED") {
+          // Phone number ko clean karo (sirf digits rakho)
+          const cleanPhone = order.customerPhone.replace(/[^0-9]/g, "");
+          const msg = encodeURIComponent(
+            `Hello ${order.customerName}, your order #${order.id.slice(-6).toUpperCase()} has been ACCEPTED by Sohan Lal & Sons Jewellers!`
+          );
+
+          // ✅ wa.me URL (Desktop aur Mobile dono par perfectly kaam karta hai)
+          window.open(`https://wa.me/${cleanPhone}?text=${msg}`, "_blank");
+        }
+        
+        fetchOrders(); // List ko refresh karo
+      } catch (error) {
+        console.error("Update failed:", error);
+        alert("Failed to update order status.");
+      }
     }
   };
 
@@ -41,11 +60,11 @@ export default function OrderList() {
         </Typography>
       </Box>
 
-      <TableContainer component={Paper} sx={{ borderRadius: 0, boxShadow: 'none', border: "1px solid #FFFFFF" }}>
+      <TableContainer component={Paper} sx={{ borderRadius: 0, boxShadow: 'none', border: "1px solid #E5D5BC" }}>
         <Table>
           <TableHead sx={{ bgcolor: "#F5EFE6" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: 700, color: "#4A0E17" }}>Order ID</TableCell> {/* ✅ ID Column */}
+              <TableCell sx={{ fontWeight: 700, color: "#4A0E17" }}>Order ID</TableCell>
               <TableCell sx={{ fontWeight: 700, color: "#4A0E17" }}>Customer</TableCell>
               <TableCell sx={{ fontWeight: 700, color: "#4A0E17" }}>Phone</TableCell>
               <TableCell sx={{ fontWeight: 700, color: "#4A0E17" }}>Amount</TableCell>
@@ -64,7 +83,6 @@ export default function OrderList() {
                   '& .MuiTableCell-root': { color: "#4A0E17 !important" }
                 }}
               >
-                {/* ✅ Order ID display (Last 6 characters) */}
                 <TableCell sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
                   #{order.id.slice(-6).toUpperCase()}
                 </TableCell>
@@ -82,8 +100,18 @@ export default function OrderList() {
                 <TableCell>
                   {order.status === "PENDING" && (
                     <Box sx={{ display: "flex", gap: 1 }}>
-                      <Button size="small" variant="outlined" color="success" onClick={() => handleStatusUpdate(order.id, "ACCEPTED")}>Accept</Button>
-                      <Button size="small" variant="outlined" color="error" onClick={() => handleStatusUpdate(order.id, "REJECTED")}>Reject</Button>
+                      <Button 
+                        size="small" variant="outlined" color="success" 
+                        onClick={() => handleStatusUpdate(order, "ACCEPTED")}
+                      >
+                        Accept
+                      </Button>
+                      <Button 
+                        size="small" variant="outlined" color="error" 
+                        onClick={() => handleStatusUpdate(order, "REJECTED")}
+                      >
+                        Reject
+                      </Button>
                     </Box>
                   )}
                   <IconButton color="error" onClick={() => handleDelete(order.id)}>
