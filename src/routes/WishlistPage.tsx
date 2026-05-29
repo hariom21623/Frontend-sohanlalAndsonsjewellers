@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Container, Box, Typography, Card, CardMedia, CardContent, IconButton, Button } from "@mui/material";
-import { DeleteOutline, ShoppingBagOutlined, ArrowBackIos } from "@mui/icons-material";
+import { DeleteOutline, ArrowBackIos } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import MainNavbar from "../components/Users/Navbar/MainNavbar";
 import UserFooter from "../components/Users/Footer/MainFooter";

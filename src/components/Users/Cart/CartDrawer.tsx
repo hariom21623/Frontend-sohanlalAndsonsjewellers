@@ -3,7 +3,7 @@ import { Drawer, Box, IconButton, Typography, List, ListItem, ListItemAvatar, Av
 import { CloseOutlined, DeleteOutline, AddOutlined, RemoveOutlined } from "@mui/icons-material";
 import { useCart } from "../../../contexts/CartProvider";
 import { useNavigate } from "react-router-dom";
-import { placeOrder } from "../../../api/orderService";
+
 
 interface CartDrawerProps {
   open: boolean;

@@ -7,7 +7,7 @@ import { placeOrder } from "../../../api/orderService";
 
 export default function CheckoutPage() {
   const { items: contextItems, total: contextTotal, clear } = useCart();
-  const { user } = useAuth() as any;
+  const { user, token } = useAuth() as any; 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -21,6 +21,12 @@ export default function CheckoutPage() {
   const { items, total } = getCartData();
 
   const handlePlaceOrder = async () => {
+    if (!token) {
+      alert("Session expired! Please login again.");
+      navigate("/login");
+      return;
+    }
+
     setLoading(true);
     try {
       const orderData = {
@@ -32,15 +38,13 @@ export default function CheckoutPage() {
         pincode: user?.pincode || "N/A"
       };
 
-      const res = await placeOrder(orderData);
+      const res = await placeOrder(orderData, token); 
       const order = res.order;
 
-      // ✅ Yahan SKU, Qty, aur Price add kar diye hain
       const itemsList = order.items.map((it: any) =>
         `* ${it.name} (SKU: ${it.sku}) | Qty: ${it.qty} | Price: ₹${it.price}`
       ).join('\n');
 
-      // ✅ Yahan format fix kar diya hai
       const msg = encodeURIComponent(
         `New Order Received!\n\n` +
         `Order ID: #${order.id.slice(-6).toUpperCase()}\n` +
@@ -53,44 +57,28 @@ export default function CheckoutPage() {
         `Date: ${new Date(order.createdAt).toLocaleString()}`
       );
 
-      window.open(`whatsapp://send?phone=919682296756&text=${msg}`, "_blank");
+      window.location.href = `whatsapp://send?phone=919682296756&text=${msg}`;
 
       clear?.();
       localStorage.removeItem("sl_cart");
       navigate("/");
-    } catch {
-      alert("Order failed!");
+    } catch (err: any) {
+      console.error(err);
+      alert("Order failed! " + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box sx={{
-      minHeight: '80vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 3
-    }}>
-      <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#4A0E17' }}>
-        Checkout
-      </Typography>
-
+    <Box sx={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+      <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#4A0E17' }}>Checkout</Typography>
       <Button
         variant="contained"
         size="large"
         disabled={loading}
         onClick={handlePlaceOrder}
-        sx={{
-          bgcolor: 'cream',
-          py: 2,
-          px: 5,
-          borderRadius: 2,
-          fontSize: '1.1rem',
-          '&:hover': { bgcolor: 'cream' }
-        }}
+        sx={{ bgcolor: '#4A0E17', py: 2, px: 5, borderRadius: 2, fontSize: '1.1rem', '&:hover': { bgcolor: '#6e1e2b' } }}
       >
         {loading ? <CircularProgress size={24} color="inherit" /> : "PLACE ORDER VIA WHATSAPP"}
       </Button>

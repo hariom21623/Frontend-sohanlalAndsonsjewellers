@@ -10,15 +10,11 @@ import { getAllPublic } from "../api/product";
 import CartDrawer from "../components/Users/Cart/CartDrawer";
 
 export default function UserHome() {
+  // const { user } = useAuth();
   const [products, setProducts] = useState<any[]>([]);
-  const [initialProducts, setInitialProducts] = useState<any[]>([]); // 🔥 Unique categories extraction ke liye backup string array
+  const [initialProducts, setInitialProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
-  const [filters, setFilters] = useState({
-    q: "",
-    category: "all",
-  });
-
+  const [filters, setFilters] = useState({ q: "", category: "all" });
   const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
@@ -31,30 +27,21 @@ export default function UserHome() {
         const res = await getAllPublic({ ...filters, signal });
         if (!signal.aborted) {
           setProducts(res.products || []);
-          
-          // Agar pehli baar fetch ho rha hai (View All par), toh dynamic categories ke liye store kar lein
           if (filters.category === "all" && filters.q === "") {
             setInitialProducts(res.products || []);
           }
         }
       } catch (err: any) {
-        if (err.name === "CanceledError" || err.message === "canceled") {
-          return; 
-        }
+        if (err.name === "CanceledError" || err.message === "canceled") return;
         console.error("Fetch failure:", err);
         setProducts([]);
       } finally {
-        if (!signal.aborted) {
-          setLoading(false);
-        }
+        if (!signal.aborted) setLoading(false);
       }
     }
 
     fetchProducts();
-
-    return () => {
-      controller.abort();
-    };
+    return () => { controller.abort(); };
   }, [filters]);
 
   const handleSearch = useCallback((q: string) => {
@@ -68,25 +55,13 @@ export default function UserHome() {
   return (
     <Box sx={{ bgcolor: "#FDFBF7", minHeight: "100vh" }}>
       <MainNavbar onSearch={handleSearch} />
-
-      {/* 🔥 Ab hum dynamic calculations ke liye products backup bhej rhe hain */}
       <CategoryStrip products={initialProducts} onSelect={handleCategory} />
-
       <HomeBanner category={filters.category} />
-
       <Container maxWidth="lg" sx={{ mt: 6, mb: 8 }}>
         {loading ? (
-          <Box sx={{ textAlign: "center", py: 6 }}>
-            <CircularProgress sx={{ color: "#4A0E17" }} />
-          </Box>
+          <Box sx={{ textAlign: "center", py: 6 }}><CircularProgress sx={{ color: "#4A0E17" }} /></Box>
         ) : products.length === 0 ? (
-          <Box sx={{ 
-            textAlign: "center", 
-            py: 8, 
-            border: "1px dashed #E5D5BC", 
-            bgcolor: "#F9F6F0",
-            px: 2
-          }}>
+          <Box sx={{ textAlign: "center", py: 8, border: "1px dashed #E5D5BC", bgcolor: "#F9F6F0", px: 2 }}>
             <Typography sx={{ fontFamily: '"Playfair Display", serif', color: "#6E6557", fontStyle: "italic", fontSize: "1.1rem" }}>
               No exquisite pieces found matching this collection selection.
             </Typography>
@@ -95,10 +70,8 @@ export default function UserHome() {
           <ProductGrid products={products} />
         )}
       </Container>
-
       <FeaturedCollections />
       <UserFooter />
-
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </Box>
   );

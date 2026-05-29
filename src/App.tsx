@@ -1,7 +1,7 @@
-import React, { useEffect } from "react"; 
+import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
-import ScrollToTop from "./components/Users/Banner/ScrollToTop"; 
+import ScrollToTop from "./components/Users/Banner/ScrollToTop";
 import WishlistPage from "./routes/WishlistPage";
 
 // Auth
@@ -14,7 +14,7 @@ import UserHome from "./routes/UserHome";
 
 // User
 import ProductDetails from "./routes/ProductDetails";
-import CollectionLanding from "./routes/CollectionLanding"; 
+import CollectionLanding from "./routes/CollectionLanding";
 
 // Admin Pages
 import UserList from "./routes/Admin/UserList";
@@ -31,6 +31,8 @@ import BillEdit from "./routes/Admin/BillEdit";
 import BillView from "./routes/Admin/BillView";
 import OrderList from "./routes/Admin/OrderList";
 import CheckoutPage from "./components/Users/Cart/CheckoutPage";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import { ToastContainer } from "react-toastify";
 
 export default function App() {
   const { token, user } = useAuth();
@@ -92,14 +94,14 @@ export default function App() {
   //   };
   // }, []);
   // ======================================================================
-  
+
 
   return (
     <>
       <PWAInstallPrompt />
-      
       {/* Global Scroll To Top Trigger */}
       <ScrollToTop />
+      <ToastContainer position="bottom-center" autoClose={3000} />
 
       <Routes>
         {/* ================= PUBLIC ================= */}
@@ -108,7 +110,7 @@ export default function App() {
 
         {/* ================= USER ================= */}
         <Route path="/" element={<UserHome />} />
-        <Route path="/user" element={<UserHome />} />
+        {/* <Route path="/user" element={<UserHome />} /> */}
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/collection/:name" element={<CollectionLanding />} />
         <Route path="/product/:id" element={<ProductDetails />} />
@@ -131,7 +133,8 @@ export default function App() {
         <Route path="/admin/bills/view/:id" element={<BillView />} />
 
         <Route path="/admin/orders" element={<OrderList />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>
+        } />
 
         {/* ================= ROOT ================= */}
         <Route

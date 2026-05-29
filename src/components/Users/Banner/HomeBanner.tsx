@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getAllPublic } from "../../../api/product";
@@ -11,7 +11,7 @@ export default function HomeBanner({ category }: Props) {
   const [banners, setBanners] = useState<any[]>([]); 
   const [bannerIndex, setBannerIndex] = useState(0); 
   const navigate = useNavigate();
-  const touchStartX = useRef(0);
+  // const touchStartX = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -63,7 +63,7 @@ export default function HomeBanner({ category }: Props) {
   const activeProduct = banners[bannerIndex];
   
   const desktopBannerUrl = activeProduct?.bannerImages?.desktopUrl || (activeProduct?.images && activeProduct.images[1] ? activeProduct.images[1] : activeProduct.images[0]);
-  const mobileBannerUrl = activeProduct?.bannerImages?.mobileUrl || desktopBannerUrl;
+  // const mobileBannerUrl = activeProduct?.bannerImages?.mobileUrl || desktopBannerUrl;
 
   const enhanceBannerQuality = (url: string) => {
     if (!url) return '';

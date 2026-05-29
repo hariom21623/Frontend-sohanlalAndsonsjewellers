@@ -1,4 +1,3 @@
-// src/contexts/AuthProvider.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { decodeToken, isTokenExpired } from "../utils/jwt";
 import * as authApi from "../api/auth";
@@ -19,86 +18,45 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(() => {
-    try {
-      return localStorage.getItem(TOKEN_KEY);
-    } catch {
-      return null;
-    }
-  });
-
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
   const [user, setUser] = useState<User | null>(() => {
-    try {
-      const t = localStorage.getItem(TOKEN_KEY);
-      if (t && !isTokenExpired(t)) {
-        return decodeToken(t);
-      }
-      return null;
-    } catch {
-      return null;
-    }
+    const t = localStorage.getItem(TOKEN_KEY);
+    return (t && !isTokenExpired(t)) ? decodeToken(t) : null;
   });
 
-  // 🔄 Sync token → user
   useEffect(() => {
-    if (!token) {
+    if (!token || isTokenExpired(token)) {
       localStorage.removeItem(TOKEN_KEY);
+      setToken(null);
       setUser(null);
       return;
     }
-
-    if (isTokenExpired(token)) {
-      logout("/");
-      return;
-    }
-
-    try {
-      const decoded = decodeToken(token);
-      setUser(decoded);
-      localStorage.setItem(TOKEN_KEY, token);
-    } catch (err) {
-      console.error("Token decode failed", err);
-      logout("/");
-    }
+    setUser(decodeToken(token));
   }, [token]);
 
-  // ✅ LOGIN
   async function login(payload: LoginArgs): Promise<User> {
     const data = await authApi.login(payload);
-
-    let receivedToken: string | null = null;
-
-    if (typeof data === "string") receivedToken = data;
-    else if (data?.token) receivedToken = data.token;
-    else if (data?.data?.token) receivedToken = data.data.token;
-
-    if (!receivedToken) {
-      throw new Error("No token received from login");
-    }
-
+    const receivedToken = typeof data === "string" ? data : (data?.token || data?.data?.token);
+    if (!receivedToken) throw new Error("No token received");
+    localStorage.setItem(TOKEN_KEY, receivedToken);
     setToken(receivedToken);
-
     const decoded = decodeToken(receivedToken);
     if (!decoded) throw new Error("Invalid token");
-
     return decoded;
   }
 
-  // ✅ REGISTER
-  async function register(payload: any) {
-    return authApi.register(payload);
-  }
+  async function register(payload: any) { return authApi.register(payload); }
 
-  // ✅ LOGOUT (FINAL FIX 🔥)
-  function logout(redirectTo?: string) {
-    localStorage.removeItem(TOKEN_KEY);
+  function logout(redirectTo: string = "/") {
+    localStorage.removeItem("sls_token");
+    localStorage.removeItem("sls_wishlist");
+    localStorage.removeItem("login_toast_shown");
     setToken(null);
     setUser(null);
 
-    // 🔥 Force navigation (solves your admin issue)
-    if (redirectTo) {
-      window.location.href = redirectTo;
-    }
+    // 🔥 Isse browser cache ignore karega aur naye headers ke saath load hoga
+    window.location.replace(redirectTo);
+    window.location.reload();
   }
 
   return (
@@ -108,11 +66,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// ✅ Hook
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }

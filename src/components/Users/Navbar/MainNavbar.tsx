@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AppBar, Toolbar, Typography, Box, InputBase, IconButton, Badge, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { ShoppingBagOutlined, FavoriteBorderOutlined, PersonOutlineOutlined, SearchOutlined, LogoutOutlined } from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom'; 
-import { useAuth } from '../../../contexts/AuthProvider'; 
-import { useCart } from '../../../contexts/CartProvider'; 
-import CartDrawer from '../Cart/CartDrawer'; 
-import TrustBar from './TrustBar'; 
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthProvider';
+import { useCart } from '../../../contexts/CartProvider';
+import CartDrawer from '../Cart/CartDrawer';
+import TrustBar from './TrustBar';
 
 interface MainNavbarProps {
   onSearch: (query: string) => void;
@@ -13,10 +13,10 @@ interface MainNavbarProps {
 
 export default function MainNavbar({ onSearch }: MainNavbarProps) {
   const { logout, user } = useAuth();
-  const { itemCount } = useCart(); 
+  const { itemCount } = useCart();
   const navigate = useNavigate();
-  const location = useLocation(); 
-  
+  const location = useLocation();
+
   const [searchVal, setSearchVal] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
@@ -41,7 +41,7 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
         const savedWishlistRaw = localStorage.getItem("sls_wishlist");
         const wishlistIds = savedWishlistRaw ? JSON.parse(savedWishlistRaw) : [];
         const newCount = Array.isArray(wishlistIds) ? wishlistIds.length : 0;
-        
+
         // Prevent setting same state to stop re-render loops & blinking
         setWishlistCount((prev) => (prev === newCount ? prev : newCount));
       } catch {
@@ -51,7 +51,7 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
 
     window.addEventListener("sls_wishlist_update", updateCount);
     window.addEventListener("storage", updateCount);
-    
+
     return () => {
       window.removeEventListener("sls_wishlist_update", updateCount);
       window.removeEventListener("storage", updateCount);
@@ -61,7 +61,7 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchVal(value);
-    onSearch(value); 
+    onSearch(value);
   };
 
   const handleLogoClick = () => {
@@ -78,15 +78,15 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
 
   return (
     <>
-      <AppBar 
-        position="sticky" 
-        elevation={0} 
+      <AppBar
+        position="sticky"
+        elevation={0}
         sx={{ borderBottom: '1px solid rgba(229, 213, 188, 0.15)', bgcolor: '#0A0A0A', zIndex: 1100 }}
       >
         <TrustBar />
 
         <Toolbar sx={{ flexDirection: 'column', alignItems: 'stretch', px: { xs: 2, md: 6 }, py: { xs: 1.9, md: 1.5 } }}>
-          
+
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: { xs: 1.5, md: 0 } }}>
             {/* Logo box */}
             <Box onClick={handleLogoClick} sx={{ display: 'flex', flexDirection: 'column', cursor: 'pointer', userSelect: 'none', '&:hover': { opacity: 0.85 } }}>
@@ -100,29 +100,29 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
 
             {/* Actions area */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1.5 } }}>
-              
+
               {/* 🚀 FIXED ZERO-BLINK WISHLIST ICON & COUNTER */}
               <IconButton onClick={() => navigate("/wishlist")} sx={{ color: '#FFFFFF', p: { xs: 0.5, sm: 1 }, '&:hover': { color: '#E5D5BC' } }}>
-                <Badge 
-                  badgeContent={memoizedWishlistCount} 
+                <Badge
+                  badgeContent={memoizedWishlistCount}
                   showZero={false} // Smoothly hides instead of flashing a 0 text node layout change
-                  sx={{ 
-                    '& .MuiBadge-badge': { 
-                      bgcolor: '#E5D5BC', 
-                      color: '#0A0A0A', 
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      bgcolor: '#E5D5BC',
+                      color: '#0A0A0A',
                       fontWeight: 700,
                       transition: 'none' // Disables native slow CSS transitions that cause layout text jumps
-                    } 
+                    }
                   }}
                 >
                   <FavoriteBorderOutlined />
                 </Badge>
               </IconButton>
-              
+
               {/* Bag Shopping Icon */}
               <IconButton onClick={() => setIsCartOpen(true)} sx={{ color: '#FFFFFF', p: { xs: 0.5, sm: 1 }, '&:hover': { color: '#E5D5BC' } }}>
-                <Badge 
-                  badgeContent={memoizedItemCount} 
+                <Badge
+                  badgeContent={memoizedItemCount}
                   showZero={false}
                   sx={{ '& .MuiBadge-badge': { bgcolor: '#E5D5BC', color: '#0A0A0A', fontWeight: 700, transition: 'none' } }}
                 >
@@ -143,21 +143,24 @@ export default function MainNavbar({ onSearch }: MainNavbarProps) {
           </Box>
         </Toolbar>
 
-        <Menu
-          anchorEl={anchorEl} open={isMenuOpen} onClose={() => setAnchorEl(null)}
-          PaperProps={{ sx: { bgcolor: '#141414', border: '1px solid rgba(229, 213, 188, 0.25)', borderRadius: 0, mt: 1, minWidth: 180, '& .MuiMenuItem-root': { fontSize: '0.8rem', color: '#FFFFFF', py: 1.4, '&:hover': { bgcolor: 'rgba(229, 213, 188, 0.08)', color: '#E5D5BC' } } } }}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        >
-          {user && (
-            <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid rgba(229, 213, 188, 0.15)', mb: 0.5 }}>
-              <Typography variant="caption" sx={{ display: 'block', color: '#B3B3B3', fontSize: '0.7rem' }}>LOGGED IN AS</Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600, color: '#E5D5BC', mt: 0.2 }}>{user.name || 'Customer'}</Typography>
-            </Box>
+        <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={() => setAnchorEl(null)}>
+          {user ? (
+            <>
+              <Box sx={{ px: 2, py: 1.5 }}>
+                <Typography variant="caption">LOGGED IN AS</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.name}</Typography>
+              </Box>
+              <MenuItem onClick={() => { setAnchorEl(null); logout("/"); }}>
+                <ListItemIcon><LogoutOutlined fontSize="small" /></ListItemIcon>
+                LOGOUT
+              </MenuItem>
+            </>
+          ) : (
+            <MenuItem onClick={() => { setAnchorEl(null); navigate("/login"); }}>
+              <ListItemIcon><PersonOutlineOutlined fontSize="small" /></ListItemIcon>
+              LOGIN
+            </MenuItem>
           )}
-          <MenuItem onClick={() => { setAnchorEl(null); logout("/login"); }}>
-            <ListItemIcon><LogoutOutlined fontSize="small" sx={{ color: '#E5D5BC' }} /></ListItemIcon>
-            LOGOUT
-          </MenuItem>
         </Menu>
       </AppBar>
 
