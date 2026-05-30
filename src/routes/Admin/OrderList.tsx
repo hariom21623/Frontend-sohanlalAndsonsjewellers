@@ -20,28 +20,34 @@ export default function OrderList() {
   }
 
   const handleStatusUpdate = async (order: any, status: string) => {
-  if (window.confirm(`Are you sure?`)) {
-    try {
-      const res = await updateOrderStatus(order.id, status);
-      
-      if (status === "ACCEPTED" && res.billLink) {
-        const cleanPhone = order.customerPhone.replace(/[^0-9]/g, "");
-        
-        // Message ko 2 parts mein todo: text aur link
-        const text = `Hello ${order.customerName}, your order #${order.id.slice(-6).toUpperCase()} is ACCEPTED!\n\nTotal: ₹${order.totalAmount}\n\nDownload Bill below:`;
-        const link = res.billLink;
-        
-        // Sirf text ko encode karo, link ko nahi
-        const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}%0A%0A${link}`;
-        
-        window.open(whatsappUrl, "_blank");
+    if (window.confirm(`Are you sure?`)) {
+      try {
+        const res = await updateOrderStatus(order.id, status);
+
+        if (status === "ACCEPTED" && res.billLink) {
+          const cleanPhone = order.customerPhone.replace(/[^0-9]/g, "");
+          const text = `Hello ${order.customerName}, your order #${order.id.slice(-6).toUpperCase()} is ACCEPTED!\n\nTotal: ₹${order.totalAmount}\n\nDownload Bill: ${res.billLink}`;
+
+          // WhatsApp Direct Scheme: Ye browser ko force karta hai ki WhatsApp dhundo
+          // Format: whatsapp://send?phone=NUMBER&text=TEXT
+          const whatsappAppUrl = `whatsapp://send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+
+          // 1. Pehle App Scheme try karo
+          window.location.href = whatsappAppUrl;
+
+          // 2. Agar 2 second mein app nahi khuli (yani app nahi hai), toh fallback web pe jao
+          setTimeout(() => {
+            const webUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+            window.open(webUrl, "_blank");
+          }, 2000);
+        }
+
+        fetchOrders();
+      } catch (error) {
+        alert("Error updating status!");
       }
-      fetchOrders();
-    } catch (error) {
-      alert("Error!");
     }
-  }
-};
+  };
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this order?")) {
