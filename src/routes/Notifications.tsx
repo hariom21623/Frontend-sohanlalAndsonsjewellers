@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Container, Typography, Box, List, ListItem, ListItemText, CircularProgress, Button } from '@mui/material';
 import { ArrowBackIos } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { getMyNotifications } from '../api/auth'; // ✅ Yahan se import karo
+import { getMyNotifications } from '../api/orderService'; // ✅ Yahan se import karo
 
 export default function Notifications() {
   const navigate = useNavigate();

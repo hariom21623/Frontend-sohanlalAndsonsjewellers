@@ -27,3 +27,9 @@ export const deleteOrder = async (id: string) => {
   const res = await axiosInstance.delete(`/order/delete/${id}`);
   return res.data;
 };
+
+export async function getMyNotifications() {
+  // ✅ Tumhare Router path aur prefix ke hisaab se sahi path:
+  const res = await axiosInstance.get('/order/notifications/my');
+  return res.data;
+}

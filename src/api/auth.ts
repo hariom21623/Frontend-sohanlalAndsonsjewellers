@@ -29,8 +29,3 @@ export async function login(payload: LoginPayload) {
   return res.data; // expected: { token: "..." } or just token
 }
 
-export async function getMyNotifications() {
-  // ✅ Tumhare Router path aur prefix ke hisaab se sahi path:
-  const res = await api.get('/order/notifications/my');
-  return res.data;
-}
