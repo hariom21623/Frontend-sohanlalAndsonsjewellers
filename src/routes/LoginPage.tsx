@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Box, TextField, Button, Typography, Alert, Container, Divider } from "@mui/material";
 import { useAuth } from "../contexts/AuthProvider";
 
@@ -10,24 +10,23 @@ export default function LoginPage() {
 
   const { login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
 
-  const from = location.state?.from || "/user";
+  // const from = location.state?.from || "/user";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-
     try {
       const loggedInUser = await login({ email, password });
 
+      // Yahan fix karo:
       if (loggedInUser.adminRole) {
-        navigate("/admin/users");
+        navigate("/admin/users", { replace: true });
       } else {
-        navigate(from);
+        navigate("/", { replace: true });
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Login failed");
+      setError("Login failed");
     }
   }
 
@@ -43,8 +42,8 @@ export default function LoginPage() {
         px: 2
       }}
     >
-      <Container 
-        maxWidth="xs" 
+      <Container
+        maxWidth="xs"
         sx={{
           p: { xs: 3, md: 5 },
           bgcolor: "#FFFFFF", // 🚀 FIXED: Pure White Card
@@ -53,12 +52,12 @@ export default function LoginPage() {
           boxShadow: "0px 12px 40px rgba(74, 14, 23, 0.03)" // Elite faint shadow matrix
         }}
       >
-        <Typography 
-          variant="h4" 
-          align="center" 
-          sx={{ 
-            fontWeight: 600, 
-            fontFamily: '"Playfair Display", serif', 
+        <Typography
+          variant="h4"
+          align="center"
+          sx={{
+            fontWeight: 600,
+            fontFamily: '"Playfair Display", serif',
             color: "#4A0E17",
             letterSpacing: "0.02em",
             mb: 1
@@ -66,16 +65,16 @@ export default function LoginPage() {
         >
           Welcome Back
         </Typography>
-        
-        <Typography 
-          variant="body2" 
-          align="center" 
-          sx={{ 
-            color: "#6E6557", 
+
+        <Typography
+          variant="body2"
+          align="center"
+          sx={{
+            color: "#6E6557",
             fontFamily: '"Montserrat", sans-serif',
             letterSpacing: "0.05em",
             fontSize: "0.8rem",
-            mb: 4 
+            mb: 4
           }}
         >
           Sign in to access your registered luxury dashboard.
@@ -83,19 +82,19 @@ export default function LoginPage() {
 
         {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 0 }}>{error}</Alert>}
 
-        <Box 
-          component="form" 
+        <Box
+          component="form"
           onSubmit={handleSubmit}
           sx={{
             "& .MuiOutlinedInput-root": {
-              borderRadius: 0, 
-              bgcolor: "#FAF8F5", 
+              borderRadius: 0,
+              bgcolor: "#FAF8F5",
               "& fieldset": { borderColor: "rgba(229, 213, 188, 0.5)" },
               "&:hover fieldset": { borderColor: "#6E6557" },
               "&.Mui-focused fieldset": { borderColor: "#4A0E17" },
-              
+
               // 🚀 🔥 ANTI-AUTOFILL ENGINE OVERRIDE: Kills browser background color distortion leaks completely!
-              "& input": { 
+              "& input": {
                 color: "#1A1A1A !important",
                 WebkitTextFillColor: "#1A1A1A !important",
                 "&:-webkit-autofill": {
@@ -111,26 +110,26 @@ export default function LoginPage() {
             }
           }}
         >
-          <TextField 
-            label="Email Address" 
-            placeholder="name@example.com" 
-            type="email" 
-            fullWidth 
-            required 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            sx={{ mb: 2.5 }} 
+          <TextField
+            label="Email Address"
+            placeholder="name@example.com"
+            type="email"
+            fullWidth
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            sx={{ mb: 2.5 }}
           />
-          
-          <TextField 
-            label="Password" 
-            placeholder="Enter your password" 
-            type="password" 
-            fullWidth 
-            required 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            sx={{ mb: 4 }} 
+
+          <TextField
+            label="Password"
+            placeholder="Enter your password"
+            type="password"
+            fullWidth
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            sx={{ mb: 4 }}
           />
 
           <Button

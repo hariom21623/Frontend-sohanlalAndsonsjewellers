@@ -25,19 +25,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    if (!token || isTokenExpired(token)) {
-      localStorage.removeItem(TOKEN_KEY);
+    const t = localStorage.getItem(TOKEN_KEY);
+    if (!t || isTokenExpired(t)) {
       setToken(null);
       setUser(null);
-      return;
+    } else {
+      setUser(decodeToken(t));
     }
-    setUser(decodeToken(token));
   }, [token]);
 
   async function login(payload: LoginArgs): Promise<User> {
     const data = await authApi.login(payload);
     const receivedToken = typeof data === "string" ? data : (data?.token || data?.data?.token);
     if (!receivedToken) throw new Error("No token received");
+    
     localStorage.setItem(TOKEN_KEY, receivedToken);
     setToken(receivedToken);
     const decoded = decodeToken(receivedToken);
@@ -45,18 +46,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return decoded;
   }
 
-  async function register(payload: any) { return authApi.register(payload); }
+  // ✅ Fixed: Register function added
+  async function register(payload: any) {
+    return await authApi.register(payload);
+  }
 
   function logout(redirectTo: string = "/") {
-    localStorage.removeItem("sls_token");
-    localStorage.removeItem("sls_wishlist");
-    localStorage.removeItem("login_toast_shown");
+    localStorage.clear();
     setToken(null);
     setUser(null);
-
-    // 🔥 Isse browser cache ignore karega aur naye headers ke saath load hoga
     window.location.replace(redirectTo);
-    window.location.reload();
   }
 
   return (
